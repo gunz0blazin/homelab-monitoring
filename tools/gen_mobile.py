@@ -24,12 +24,12 @@ board = D.stat("Services", "monitor_status", pos(0, 7, 24, 12), thresholds=STATU
 board["fieldConfig"]["defaults"]["mappings"] = D.status_mappings()
 
 D.bars("CPU", '100 * (1 - (sum by (host) (rate(node_cpu_seconds_total{mode="idle"}[5m])) / sum by (host) (rate(node_cpu_seconds_total[5m]))))',
-       pos(0, 19, 24, 7), PCT_USED)
-D.bars("Memory", '100 * (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes))', pos(0, 26, 24, 7), PCT_USED)
+       pos(0, 19, 24, 10), PCT_USED)
+D.bars("Memory", '100 * (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes))', pos(0, 29, 24, 10), PCT_USED)
 D.bars("Disk (/)",
        '100 * (1 - (node_filesystem_avail_bytes{mountpoint="/",fstype!~"tmpfs|overlay"} / node_filesystem_size_bytes{mountpoint="/",fstype!~"tmpfs|overlay"}))',
-       pos(0, 33, 24, 7), PCT_USED)
-D.timeseries("Response time", "monitor_response_time", "{{monitor_name}}", pos(0, 40, 24, 8), "ms", vmin=0,
+       pos(0, 39, 24, 10), PCT_USED)
+D.timeseries("Response time", "monitor_response_time", "{{monitor_name}}", pos(0, 49, 24, 8), "ms", vmin=0,
              overrides=color_overrides(MONITOR_COLORS), table_legend=False)
 
 D.finish("grafana/dashboards/homelab-mobile.json", "homelab-mobile", "Homelab Mobile",

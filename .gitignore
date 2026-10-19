@@ -1,0 +1,8 @@
+# Never commit secrets or keys
+*.env
+secrets/
+*_api_key
+*_token
+*_password
+id_ed25519*
+ntfy_url

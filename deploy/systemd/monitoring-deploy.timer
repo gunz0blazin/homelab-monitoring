@@ -1,0 +1,10 @@
+[Unit]
+Description=Check GitHub for monitoring changes every 5 minutes
+
+[Timer]
+OnBootSec=1min
+OnUnitActiveSec=5min
+RandomizedDelaySec=20
+
+[Install]
+WantedBy=timers.target

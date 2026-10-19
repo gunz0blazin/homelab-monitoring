@@ -1,0 +1,34 @@
+# Same stack as the hand-made /opt/monitoring, so the existing data volumes are reused.
+# The deploy runs it with `-p monitoring`; that project name is what keeps
+# monitoring_prometheus-data and monitoring_grafana-data attached.
+services:
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --storage.tsdb.retention.time=365d
+    volumes:
+      # The folder, not the single file: a deploy replaces files, and a single-file
+      # bind mount would keep showing the old copy.
+      - ./prometheus:/etc/prometheus:ro
+      - prometheus-data:/prometheus
+    ports:
+      - "9090:9090"
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana-oss:latest
+    container_name: grafana
+    volumes:
+      - grafana-data:/var/lib/grafana
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+
+volumes:
+  prometheus-data:
+  grafana-data:

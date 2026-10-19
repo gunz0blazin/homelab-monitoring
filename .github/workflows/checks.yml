@@ -1,0 +1,30 @@
+name: checks
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: YAML lint
+        run: |
+          pip install --quiet yamllint
+          yamllint -d '{extends: default, rules: {line-length: disable, document-start: disable, truthy: disable, indentation: {spaces: consistent, indent-sequences: consistent}}}' docker-compose.yml prometheus
+
+      - name: Compose file is valid
+        run: docker compose -f docker-compose.yml config -q
+
+      - name: Prometheus accepts the config
+        run: |
+          IMG=$(docker compose -f docker-compose.yml config --images | grep -m1 prometheus)
+          docker run --rm --entrypoint promtool -v "$PWD/prometheus:/etc/prometheus:ro" "$IMG" \
+            check config /etc/prometheus/prometheus.yml
+
+      - name: Shell scripts parse
+        run: |
+          sh -n deploy/monitoring-deploy
+          sh -n deploy/bootstrap.sh

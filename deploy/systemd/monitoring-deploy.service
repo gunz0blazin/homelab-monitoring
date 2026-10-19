@@ -1,0 +1,8 @@
+[Unit]
+Description=Deploy the Prometheus and Grafana stack from GitHub
+After=network-online.target docker.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/monitoring-deploy

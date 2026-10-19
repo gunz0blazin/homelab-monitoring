@@ -1,0 +1,98 @@
+#!/bin/sh
+# Pull the homelab-monitoring repo and keep the Prometheus and Grafana containers in step
+# with it. Run by monitoring-deploy.timer every 5 minutes as root; safe to run by hand.
+#
+# A new commit is checked in a scratch copy first (YAML parses, compose file is valid, and
+# Prometheus's own `promtool check config` passes). Only then is it applied, so a typo pushed
+# to the repo never reaches the running monitoring. A bad commit is reported once, and the
+# stack keeps running the last good one.
+set -eu
+
+CONF=${CONF:-/etc/monitoring-deploy}
+APP=${APP:-/opt/monitoring-repo}
+SRC=$APP/repo
+STATE=$APP/state
+PROJECT=monitoring    # must stay "monitoring": it keeps the existing data volumes attached
+
+[ -r "$CONF/deploy.env" ] || { echo "missing $CONF/deploy.env (run deploy/bootstrap.sh)" >&2; exit 1; }
+. "$CONF/deploy.env"    # REPO_URL, BRANCH
+
+# Optional push notification: put the full ntfy topic URL in $CONF/ntfy_url.
+# For a protected topic or a self-hosted server, also put an access token in $CONF/ntfy_token.
+notify() {    # notify <title> <tags> <body>
+  [ -s "$CONF/ntfy_url" ] || return 0
+  auth=
+  [ -s "$CONF/ntfy_token" ] && auth="Authorization: Bearer $(cat "$CONF/ntfy_token")"
+  curl -fsS -m 10 ${auth:+-H "$auth"} -H "Title: $1" -H "Tags: $2" -d "$3" "$(cat "$CONF/ntfy_url")" >/dev/null 2>&1 || true
+}
+
+compose() { docker compose -p "$PROJECT" -f "$SRC/docker-compose.yml" "$@"; }
+
+mkdir -p "$APP" "$STATE"
+if [ ! -d "$SRC/.git" ]; then
+  git clone --quiet --branch "$BRANCH" "$REPO_URL" "$SRC"
+fi
+git -C "$SRC" fetch --quiet origin "$BRANCH"
+
+NEW=$(git -C "$SRC" rev-parse "origin/$BRANCH")
+CUR=$(cat "$STATE/deployed" 2>/dev/null || true)
+FAILED=$(cat "$STATE/failed" 2>/dev/null || true)
+SUBJECT=$(git -C "$SRC" log -1 --format=%s "origin/$BRANCH")
+
+if [ "$NEW" = "$CUR" ]; then
+  # Nothing new. Make sure the stack is still up (a no-op when it is).
+  compose up -d --remove-orphans >/dev/null 2>&1 || true
+  exit 0
+fi
+
+# A commit that already failed is not retried until a newer one arrives.
+[ "$NEW" = "$FAILED" ] && exit 0
+
+check_and_apply() (
+  TMP=$(mktemp -d)
+  trap 'rm -rf "$TMP"' EXIT
+
+  git -C "$SRC" archive "origin/$BRANCH" | tar -x -C "$TMP" || exit 1
+
+  if python3 -c 'import yaml' 2>/dev/null; then
+    for f in "$TMP"/prometheus/*.yml "$TMP"/prometheus/targets/*.yml; do
+      [ -e "$f" ] || continue
+      python3 -c '
+import sys, yaml
+try:
+    yaml.safe_load(open(sys.argv[1]))
+except yaml.YAMLError as e:
+    mark = getattr(e, "problem_mark", None)
+    where = " (line %d)" % (mark.line + 1) if mark else ""
+    print("invalid YAML in %s%s: %s" % (sys.argv[2], where, getattr(e, "problem", e)))
+    sys.exit(1)
+' "$f" "${f#"$TMP"/}" || exit 1
+    done
+  fi
+
+  docker compose -f "$TMP/docker-compose.yml" config -q || { echo "invalid docker-compose.yml"; exit 1; }
+
+  # Prometheus's own check, using the same image the stack runs.
+  IMG=$(docker compose -f "$TMP/docker-compose.yml" config --images | grep -m1 prometheus || true)
+  if [ -n "$IMG" ]; then
+    docker run --rm --entrypoint promtool -v "$TMP/prometheus:/etc/prometheus:ro" "$IMG" \
+      check config /etc/prometheus/prometheus.yml || { echo "promtool rejected prometheus.yml"; exit 1; }
+  fi
+
+  git -C "$SRC" reset --quiet --hard "origin/$BRANCH" || exit 1
+  compose up -d --remove-orphans || exit 1
+  # Prometheus reads its config on SIGHUP; harmless when nothing changed.
+  compose kill -s HUP prometheus >/dev/null 2>&1 || true
+)
+
+if out=$(check_and_apply 2>&1); then
+  echo "$NEW" > "$STATE/deployed"
+  rm -f "$STATE/failed"
+  echo "deployed $NEW: $SUBJECT"
+  notify "Monitoring updated" "white_check_mark" "$SUBJECT"
+else
+  echo "$NEW" > "$STATE/failed"
+  echo "deploy of $NEW failed: $out" >&2
+  notify "Monitoring deploy failed" "warning" "$SUBJECT: $(echo "$out" | tail -n 3)"
+  exit 1
+fi

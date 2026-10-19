@@ -909,7 +909,7 @@
         "x": 0,
         "y": 35,
         "w": 24,
-        "h": 10
+        "h": 15
       },
       "targets": [
         {
@@ -1089,8 +1089,8 @@
         "minVizHeight": 16,
         "minVizWidth": 8,
         "text": {
-          "titleSize": 13,
-          "valueSize": 16
+          "titleSize": 12,
+          "valueSize": 14
         },
         "reduceOptions": {
           "calcs": [
@@ -1112,7 +1112,7 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 45,
+        "y": 50,
         "w": 24,
         "h": 8
       },

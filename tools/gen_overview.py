@@ -29,27 +29,28 @@ D.stat("DNS time", 'monitor_response_time{monitor_type="dns"}', pos(20, 0, 4, 5)
 D.status_history("last 6 hours", "monitor_status", "{{monitor_name}}", pos(0, 5, 24, 9), points=60)
 
 # --- response times and 30 day uptime
-D.timeseries("Response time", "monitor_response_time", "{{monitor_name}}", pos(0, 14, 14, 12), "ms", vmin=0,
+D.timeseries("Response time", "monitor_response_time", "{{monitor_name}}", pos(0, 14, 14, 14), "ms", vmin=0,
              overrides=color_overrides(MONITOR_COLORS_M))
-D.bars("Uptime by service, 30 days", 'monitor_uptime_ratio{window="30d"} * 100', pos(14, 14, 10, 12), UPTIME_M,
-       unit="percent", vmin=90, vmax=100, decimals=2, legend="{{monitor_name}}", display="gradient", transparent=True)
+D.bars("Uptime by service, 30 days", 'monitor_uptime_ratio{window="30d"} * 100', pos(14, 14, 10, 14), UPTIME_M,
+       unit="percent", vmin=90, vmax=100, decimals=2, legend="{{monitor_name}}", display="gradient", transparent=True,
+       title_size=12, value_size=14)
 
 # --- hosts: gauges first, trends underneath
 D.add({"id": D.nid(), "type": "row", "title": "Hosts (node exporter)", "collapsed": False,
-       "gridPos": pos(0, 26, 24, 1), "panels": []})
+       "gridPos": pos(0, 28, 24, 1), "panels": []})
 D.host_table("hosts", [
     ("CPU", 'max by (host) (100 * (1 - (sum by (host) (rate(node_cpu_seconds_total{mode="idle"}[5m])) / sum by (host) (rate(node_cpu_seconds_total[5m])))))', C["blue"]),
     ("Mem", 'max by (host) (100 * (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)))', C["mauve"]),
     ("Disk", 'max by (host) (100 * (1 - (node_filesystem_avail_bytes{mountpoint="/",fstype!~"tmpfs|overlay"} / node_filesystem_size_bytes{mountpoint="/",fstype!~"tmpfs|overlay"})))', C["lavender"]),
-], pos(0, 27, 24, 9))
+], pos(0, 29, 24, 9))
 hosts = color_overrides(HOST_COLORS_M)
 D.timeseries("CPU used", '100 * (1 - (sum by (host) (rate(node_cpu_seconds_total{mode="idle"}[5m])) / sum by (host) (rate(node_cpu_seconds_total[5m]))))',
-             "{{host}}", pos(0, 36, 8, 8), "percent", 0, 100, hosts)
+             "{{host}}", pos(0, 38, 8, 8), "percent", 0, 100, hosts)
 D.timeseries("Memory used", '100 * (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes))',
-             "{{host}}", pos(8, 36, 8, 8), "percent", 0, 100, hosts)
+             "{{host}}", pos(8, 38, 8, 8), "percent", 0, 100, hosts)
 D.timeseries("Disk used (/)",
              '100 * (1 - (node_filesystem_avail_bytes{mountpoint="/",fstype!~"tmpfs|overlay"} / node_filesystem_size_bytes{mountpoint="/",fstype!~"tmpfs|overlay"}))',
-             "{{host}}", pos(16, 36, 8, 8), "percent", 0, 100, hosts)
+             "{{host}}", pos(16, 38, 8, 8), "percent", 0, 100, hosts)
 
 D.finish("grafana/dashboards/homelab-overview.json", "homelab-overview", "Homelab Overview",
          "Service status from Uptime Kuma, and host load from node exporters. Source: the homelab-monitoring repo.",

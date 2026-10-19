@@ -91,7 +91,7 @@ class Dash:
                         "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": False}}})
 
     def bars(self, title, expr, g, thresholds, unit="percent", vmin=0, vmax=100, decimals=0, legend="{{host}}",
-             display="basic", overrides=None, transparent=False):
+             display="basic", overrides=None, transparent=False, title_size=13, value_size=16):
         defaults = {"unit": unit, "decimals": decimals, "min": vmin}
         if vmax is not None:
             defaults["max"] = vmax
@@ -103,7 +103,7 @@ class Dash:
             "fieldConfig": {"defaults": defaults, "overrides": overrides or []},
             "options": {"orientation": "horizontal", "displayMode": display, "showUnfilled": True,
                         "valueMode": "color", "namePlacement": "top", "minVizHeight": 16, "minVizWidth": 8,
-                        "text": {"titleSize": 13, "valueSize": 16},
+                        "text": {"titleSize": title_size, "valueSize": value_size},
                         "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": False}}})
         if transparent:
             panel["transparent"] = True

@@ -42,11 +42,12 @@ D.host_table("hosts", [
 ], pos(0, 24, 24, 11))
 
 # 6. latest response time per service, each bar in its own Mocha colour
-D.bars("latency now", "monitor_response_time", pos(0, 35, 24, 10), steps((INFO, None)), unit="ms", vmin=0, vmax=None,
-       legend="{{monitor_name}}", display="gradient", overrides=color_overrides(MONITOR_COLORS_M), transparent=True)
+D.bars("latency now", "monitor_response_time", pos(0, 35, 24, 15), steps((INFO, None)), unit="ms", vmin=0, vmax=None,
+       legend="{{monitor_name}}", display="gradient", overrides=color_overrides(MONITOR_COLORS_M), transparent=True,
+       title_size=12, value_size=14)   # 9 bars: ~50 px each so the names and values aren't clipped
 
 # 7. response time over the last 6 hours
-D.timeseries("response time", "monitor_response_time", "{{monitor_name}}", pos(0, 45, 24, 8), "ms", vmin=0,
+D.timeseries("response time", "monitor_response_time", "{{monitor_name}}", pos(0, 50, 24, 8), "ms", vmin=0,
              overrides=color_overrides(MONITOR_COLORS_M), table_legend=False)
 
 D.finish("grafana/dashboards/homelab-mobile.json", "homelab-mobile", "Homelab Mobile",

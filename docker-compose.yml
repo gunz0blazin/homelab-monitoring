@@ -22,6 +22,10 @@ services:
   grafana:
     image: grafana/grafana-oss:13.0.2
     container_name: grafana
+    environment:
+      # Business Text panel, used by the cards on the Homelab dashboard. Grafana downloads it from
+      # grafana.com when the container starts and keeps it in the grafana-data volume.
+      - GF_INSTALL_PLUGINS=marcusolsson-dynamictext-panel 6.3.0
     volumes:
       - grafana-data:/var/lib/grafana
       # Only the dashboards provisioning folder, so anything made in the UI is left alone.

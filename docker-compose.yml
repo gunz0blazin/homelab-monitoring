@@ -36,6 +36,9 @@ services:
   uptime-kuma:
     image: louislam/uptime-kuma:2.5.6
     container_name: uptime-kuma
+    environment:
+      # Kuma's notification templates print times in the process's time zone (UTC otherwise).
+      - TZ=America/New_York
     volumes:
       - uptime-kuma-data:/app/data
     ports:

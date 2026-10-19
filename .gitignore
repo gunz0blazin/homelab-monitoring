@@ -6,3 +6,6 @@ secrets/
 *_password
 id_ed25519*
 ntfy_url
+
+# Python bytecode from tools/
+__pycache__/

@@ -9,13 +9,13 @@
   "schemaVersion": 39,
   "version": 1,
   "editable": true,
-  "graphTooltip": 0,
+  "graphTooltip": 1,
   "refresh": "30s",
   "time": {
     "from": "now-6h",
     "to": "now"
   },
-  "description": "Phone-sized view of Homelab Overview: big status tiles and one bar per host. Source: the homelab-monitoring repo.",
+  "description": "Phone-sized view of Homelab Overview: status at a glance and one bar per host. Source: the homelab-monitoring repo.",
   "templating": {
     "list": [
       {
@@ -54,6 +54,7 @@
       "id": 1,
       "type": "stat",
       "title": "Up",
+      "description": "",
       "datasource": {
         "type": "prometheus",
         "uid": "${datasource}"
@@ -64,6 +65,7 @@
         "w": 8,
         "h": 4
       },
+      "transparent": true,
       "targets": [
         {
           "datasource": {
@@ -87,7 +89,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "#a6e3a1",
+                "color": "#94e2d5",
                 "value": null
               }
             ]
@@ -96,11 +98,16 @@
         "overrides": []
       },
       "options": {
-        "colorMode": "background",
+        "colorMode": "value",
         "graphMode": "none",
         "justifyMode": "center",
         "orientation": "auto",
         "textMode": "value",
+        "wideLayout": true,
+        "text": {
+          "valueSize": 44,
+          "titleSize": 14
+        },
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -114,6 +121,7 @@
       "id": 2,
       "type": "stat",
       "title": "Down",
+      "description": "",
       "datasource": {
         "type": "prometheus",
         "uid": "${datasource}"
@@ -124,6 +132,7 @@
         "w": 8,
         "h": 4
       },
+      "transparent": true,
       "targets": [
         {
           "datasource": {
@@ -147,7 +156,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "#a6e3a1",
+                "color": "#6c7086",
                 "value": null
               },
               {
@@ -160,11 +169,16 @@
         "overrides": []
       },
       "options": {
-        "colorMode": "background",
+        "colorMode": "value",
         "graphMode": "none",
         "justifyMode": "center",
         "orientation": "auto",
         "textMode": "value",
+        "wideLayout": true,
+        "text": {
+          "valueSize": 44,
+          "titleSize": 14
+        },
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -178,6 +192,7 @@
       "id": 3,
       "type": "stat",
       "title": "Pending",
+      "description": "",
       "datasource": {
         "type": "prometheus",
         "uid": "${datasource}"
@@ -188,6 +203,7 @@
         "w": 8,
         "h": 4
       },
+      "transparent": true,
       "targets": [
         {
           "datasource": {
@@ -211,7 +227,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "#a6e3a1",
+                "color": "#6c7086",
                 "value": null
               },
               {
@@ -224,11 +240,16 @@
         "overrides": []
       },
       "options": {
-        "colorMode": "background",
+        "colorMode": "value",
         "graphMode": "none",
         "justifyMode": "center",
         "orientation": "auto",
         "textMode": "value",
+        "wideLayout": true,
+        "text": {
+          "valueSize": 44,
+          "titleSize": 14
+        },
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -242,6 +263,7 @@
       "id": 4,
       "type": "stat",
       "title": "Uptime 24h",
+      "description": "",
       "datasource": {
         "type": "prometheus",
         "uid": "${datasource}"
@@ -252,6 +274,7 @@
         "w": 12,
         "h": 3
       },
+      "transparent": true,
       "targets": [
         {
           "datasource": {
@@ -283,7 +306,7 @@
                 "value": 99
               },
               {
-                "color": "#a6e3a1",
+                "color": "#94e2d5",
                 "value": 99.9
               }
             ]
@@ -293,11 +316,16 @@
         "overrides": []
       },
       "options": {
-        "colorMode": "background",
+        "colorMode": "value",
         "graphMode": "none",
         "justifyMode": "center",
         "orientation": "auto",
         "textMode": "value",
+        "wideLayout": true,
+        "text": {
+          "valueSize": 32,
+          "titleSize": 14
+        },
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -311,6 +339,7 @@
       "id": 5,
       "type": "stat",
       "title": "Uptime 30d",
+      "description": "",
       "datasource": {
         "type": "prometheus",
         "uid": "${datasource}"
@@ -321,6 +350,7 @@
         "w": 12,
         "h": 3
       },
+      "transparent": true,
       "targets": [
         {
           "datasource": {
@@ -352,7 +382,7 @@
                 "value": 99
               },
               {
-                "color": "#a6e3a1",
+                "color": "#94e2d5",
                 "value": 99.9
               }
             ]
@@ -362,11 +392,16 @@
         "overrides": []
       },
       "options": {
-        "colorMode": "background",
+        "colorMode": "value",
         "graphMode": "none",
         "justifyMode": "center",
         "orientation": "auto",
         "textMode": "value",
+        "wideLayout": true,
+        "text": {
+          "valueSize": 32,
+          "titleSize": 14
+        },
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -380,6 +415,7 @@
       "id": 6,
       "type": "stat",
       "title": "Services",
+      "description": "",
       "datasource": {
         "type": "prometheus",
         "uid": "${datasource}"
@@ -390,6 +426,7 @@
         "w": 24,
         "h": 12
       },
+      "transparent": true,
       "targets": [
         {
           "datasource": {
@@ -417,7 +454,7 @@
                 "value": null
               },
               {
-                "color": "#a6e3a1",
+                "color": "#94e2d5",
                 "value": 1
               },
               {
@@ -441,7 +478,7 @@
                 },
                 "1": {
                   "text": "UP",
-                  "color": "#a6e3a1",
+                  "color": "#94e2d5",
                   "index": 1
                 },
                 "2": {
@@ -461,19 +498,23 @@
         "overrides": []
       },
       "options": {
-        "colorMode": "background",
+        "colorMode": "value",
         "graphMode": "none",
         "justifyMode": "center",
         "orientation": "auto",
         "textMode": "value_and_name",
+        "wideLayout": true,
+        "text": {
+          "valueSize": 28,
+          "titleSize": 14
+        },
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
           ],
           "fields": "",
           "values": false
-        },
-        "wideLayout": true
+        }
       }
     },
     {
@@ -516,11 +557,11 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "#a6e3a1",
+                "color": "#89b4fa",
                 "value": null
               },
               {
-                "color": "#f9e2af",
+                "color": "#fab387",
                 "value": 75
               },
               {
@@ -589,11 +630,11 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "#a6e3a1",
+                "color": "#89b4fa",
                 "value": null
               },
               {
-                "color": "#f9e2af",
+                "color": "#fab387",
                 "value": 75
               },
               {
@@ -662,11 +703,11 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "#a6e3a1",
+                "color": "#89b4fa",
                 "value": null
               },
               {
-                "color": "#f9e2af",
+                "color": "#fab387",
                 "value": 75
               },
               {
@@ -723,18 +764,19 @@
       "fieldConfig": {
         "defaults": {
           "unit": "ms",
-          "min": 0,
           "color": {
             "mode": "palette-classic"
           },
           "custom": {
             "drawStyle": "line",
             "lineWidth": 2,
-            "fillOpacity": 8,
+            "fillOpacity": 14,
+            "gradientMode": "opacity",
             "showPoints": "never",
             "lineInterpolation": "smooth",
             "spanNulls": true
-          }
+          },
+          "min": 0
         },
         "overrides": [
           {
@@ -876,9 +918,9 @@
       },
       "options": {
         "legend": {
-          "showLegend": false,
           "displayMode": "list",
           "placement": "bottom",
+          "showLegend": false,
           "calcs": []
         },
         "tooltip": {

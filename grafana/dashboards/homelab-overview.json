@@ -34,6 +34,20 @@
   "annotations": {
     "list": []
   },
+  "links": [
+    {
+      "title": "Mobile view",
+      "type": "link",
+      "url": "/d/homelab-mobile",
+      "icon": "dashboard",
+      "targetBlank": false,
+      "asDropdown": false,
+      "includeVars": false,
+      "keepTime": false,
+      "tags": [],
+      "tooltip": ""
+    }
+  ],
   "panels": [
     {
       "id": 1,
@@ -50,6 +64,7 @@
         "w": 4,
         "h": 4
       },
+      "transparent": true,
       "targets": [
         {
           "datasource": {
@@ -71,7 +86,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "#a6e3a1",
+                "color": "#94e2d5",
                 "value": null
               }
             ]
@@ -80,11 +95,16 @@
         "overrides": []
       },
       "options": {
-        "colorMode": "background",
+        "colorMode": "value",
         "graphMode": "none",
         "justifyMode": "center",
         "orientation": "auto",
         "textMode": "value",
+        "wideLayout": true,
+        "text": {
+          "valueSize": 44,
+          "titleSize": 14
+        },
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -109,6 +129,7 @@
         "w": 4,
         "h": 4
       },
+      "transparent": true,
       "targets": [
         {
           "datasource": {
@@ -130,7 +151,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "#a6e3a1",
+                "color": "#6c7086",
                 "value": null
               },
               {
@@ -143,11 +164,16 @@
         "overrides": []
       },
       "options": {
-        "colorMode": "background",
+        "colorMode": "value",
         "graphMode": "none",
         "justifyMode": "center",
         "orientation": "auto",
         "textMode": "value",
+        "wideLayout": true,
+        "text": {
+          "valueSize": 44,
+          "titleSize": 14
+        },
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -172,6 +198,7 @@
         "w": 4,
         "h": 4
       },
+      "transparent": true,
       "targets": [
         {
           "datasource": {
@@ -193,7 +220,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "#a6e3a1",
+                "color": "#6c7086",
                 "value": null
               },
               {
@@ -206,11 +233,16 @@
         "overrides": []
       },
       "options": {
-        "colorMode": "background",
+        "colorMode": "value",
         "graphMode": "none",
         "justifyMode": "center",
         "orientation": "auto",
         "textMode": "value",
+        "wideLayout": true,
+        "text": {
+          "valueSize": 44,
+          "titleSize": 14
+        },
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -235,6 +267,7 @@
         "w": 4,
         "h": 4
       },
+      "transparent": true,
       "targets": [
         {
           "datasource": {
@@ -264,7 +297,7 @@
                 "value": 99
               },
               {
-                "color": "#a6e3a1",
+                "color": "#94e2d5",
                 "value": 99.9
               }
             ]
@@ -274,11 +307,16 @@
         "overrides": []
       },
       "options": {
-        "colorMode": "background",
-        "graphMode": "none",
+        "colorMode": "value",
+        "graphMode": "area",
         "justifyMode": "center",
         "orientation": "auto",
         "textMode": "value",
+        "wideLayout": true,
+        "text": {
+          "valueSize": 44,
+          "titleSize": 14
+        },
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -303,6 +341,7 @@
         "w": 4,
         "h": 4
       },
+      "transparent": true,
       "targets": [
         {
           "datasource": {
@@ -332,7 +371,7 @@
                 "value": 99
               },
               {
-                "color": "#a6e3a1",
+                "color": "#94e2d5",
                 "value": 99.9
               }
             ]
@@ -342,11 +381,16 @@
         "overrides": []
       },
       "options": {
-        "colorMode": "background",
-        "graphMode": "none",
+        "colorMode": "value",
+        "graphMode": "area",
         "justifyMode": "center",
         "orientation": "auto",
         "textMode": "value",
+        "wideLayout": true,
+        "text": {
+          "valueSize": 44,
+          "titleSize": 14
+        },
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -371,6 +415,7 @@
         "w": 4,
         "h": 4
       },
+      "transparent": true,
       "targets": [
         {
           "datasource": {
@@ -392,11 +437,11 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "#a6e3a1",
+                "color": "#89b4fa",
                 "value": null
               },
               {
-                "color": "#f9e2af",
+                "color": "#fab387",
                 "value": 100
               },
               {
@@ -410,11 +455,16 @@
         "overrides": []
       },
       "options": {
-        "colorMode": "background",
-        "graphMode": "none",
+        "colorMode": "value",
+        "graphMode": "area",
         "justifyMode": "center",
         "orientation": "auto",
         "textMode": "value",
+        "wideLayout": true,
+        "text": {
+          "valueSize": 44,
+          "titleSize": 14
+        },
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -455,7 +505,7 @@
             "mode": "thresholds"
           },
           "custom": {
-            "fillOpacity": 80,
+            "fillOpacity": 55,
             "lineWidth": 0
           },
           "mappings": [
@@ -469,7 +519,7 @@
                 },
                 "1": {
                   "text": "UP",
-                  "color": "#a6e3a1",
+                  "color": "#94e2d5",
                   "index": 1
                 },
                 "2": {
@@ -478,7 +528,7 @@
                   "index": 2
                 },
                 "3": {
-                  "text": "MAINTENANCE",
+                  "text": "MAINT",
                   "color": "#89b4fa",
                   "index": 3
                 }
@@ -489,8 +539,20 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "#a6e3a1",
+                "color": "#f38ba8",
                 "value": null
+              },
+              {
+                "color": "#94e2d5",
+                "value": 1
+              },
+              {
+                "color": "#f9e2af",
+                "value": 2
+              },
+              {
+                "color": "#89b4fa",
+                "value": 3
               }
             ]
           }
@@ -500,7 +562,7 @@
       "options": {
         "mergeValues": true,
         "showValue": "never",
-        "rowHeight": 0.85,
+        "rowHeight": 0.7,
         "alignValue": "center",
         "legend": {
           "displayMode": "list",
@@ -547,7 +609,8 @@
           "custom": {
             "drawStyle": "line",
             "lineWidth": 2,
-            "fillOpacity": 8,
+            "fillOpacity": 14,
+            "gradientMode": "opacity",
             "showPoints": "never",
             "lineInterpolation": "smooth",
             "spanNulls": true
@@ -756,7 +819,7 @@
                 "value": 99
               },
               {
-                "color": "#a6e3a1",
+                "color": "#94e2d5",
                 "value": 99.9
               }
             ]
@@ -769,7 +832,7 @@
         "displayMode": "gradient",
         "showUnfilled": true,
         "valueMode": "color",
-        "namePlacement": "auto",
+        "namePlacement": "top",
         "minVizHeight": 16,
         "minVizWidth": 8,
         "reduceOptions": {
@@ -828,30 +891,14 @@
           "custom": {
             "drawStyle": "line",
             "lineWidth": 2,
-            "fillOpacity": 8,
+            "fillOpacity": 14,
+            "gradientMode": "opacity",
             "showPoints": "never",
             "lineInterpolation": "smooth",
             "spanNulls": true
           },
           "min": 0,
-          "max": 100,
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "#a6e3a1",
-                "value": null
-              },
-              {
-                "color": "#f9e2af",
-                "value": 75
-              },
-              {
-                "color": "#f38ba8",
-                "value": 90
-              }
-            ]
-          }
+          "max": 100
         },
         "overrides": [
           {
@@ -996,30 +1043,14 @@
           "custom": {
             "drawStyle": "line",
             "lineWidth": 2,
-            "fillOpacity": 8,
+            "fillOpacity": 14,
+            "gradientMode": "opacity",
             "showPoints": "never",
             "lineInterpolation": "smooth",
             "spanNulls": true
           },
           "min": 0,
-          "max": 100,
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "#a6e3a1",
-                "value": null
-              },
-              {
-                "color": "#f9e2af",
-                "value": 75
-              },
-              {
-                "color": "#f38ba8",
-                "value": 90
-              }
-            ]
-          }
+          "max": 100
         },
         "overrides": [
           {
@@ -1164,30 +1195,14 @@
           "custom": {
             "drawStyle": "line",
             "lineWidth": 2,
-            "fillOpacity": 8,
+            "fillOpacity": 14,
+            "gradientMode": "opacity",
             "showPoints": "never",
             "lineInterpolation": "smooth",
             "spanNulls": true
           },
           "min": 0,
-          "max": 100,
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "#a6e3a1",
-                "value": null
-              },
-              {
-                "color": "#f9e2af",
-                "value": 75
-              },
-              {
-                "color": "#f38ba8",
-                "value": 90
-              }
-            ]
-          }
+          "max": 100
         },
         "overrides": [
           {
@@ -1297,20 +1312,6 @@
           "sort": "desc"
         }
       }
-    }
-  ],
-  "links": [
-    {
-      "title": "Mobile view",
-      "type": "link",
-      "url": "/d/homelab-mobile",
-      "icon": "dashboard",
-      "targetBlank": false,
-      "asDropdown": false,
-      "includeVars": false,
-      "keepTime": false,
-      "tags": [],
-      "tooltip": ""
     }
   ]
 }

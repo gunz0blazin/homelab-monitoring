@@ -11,13 +11,8 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from dashlib import *  # noqa: E402,F401,F403
 
 # No greens on this board: "up" is sapphire, the banner is mauve, and red/peach/yellow still mean trouble.
-UP = C["sapphire"]
-D = Dash(healthy=UP, maint=C["lavender"])
+D = Dash(healthy=UP, maint=C["lavender"])   # UP, UPTIME_M, MONITOR_COLORS_M come from dashlib
 quiet = lambda hit: steps((MUTED, None), (hit, 1))
-UPTIME_M = steps((BAD, None), (PENDING, 95), (UP, 99))
-MONITOR_COLORS_M = {"420NAS": C["pink"], "Grafana": C["peach"], "Home Assistant": C["sky"], "NPM": C["lavender"],
-                    "PiHole Primary": C["flamingo"], "Plex": C["yellow"], "Proxmox": C["mauve"],
-                    "qBittorent": C["blue"], "Uptime Kuma": C["rosewater"]}
 
 # 1. banner: one phrase for the whole lab
 D.hero("", '(count(monitor_status == 0) or vector(0)) * 10 + (count(monitor_status == 2 or monitor_status == 3) or vector(0))',

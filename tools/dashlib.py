@@ -23,6 +23,15 @@ MONITOR_COLORS = {"420NAS": C["teal"], "Grafana": C["peach"], "Home Assistant": 
                   "Uptime Kuma": C["green"]}
 
 
+# Green-free versions used by both dashboards: "up" is sapphire, line colours avoid teal and green.
+UP = C["sapphire"]
+HOST_COLORS_M = {"proxmox": C["peach"], "pihole": C["flamingo"], "dockers": C["blue"],
+                 "tailscale": C["pink"], "plex": C["yellow"], "qbittorrent": C["mauve"]}
+MONITOR_COLORS_M = {"420NAS": C["pink"], "Grafana": C["peach"], "Home Assistant": C["sky"], "NPM": C["lavender"],
+                    "PiHole Primary": C["flamingo"], "Plex": C["yellow"], "Proxmox": C["mauve"],
+                    "qBittorent": C["blue"], "Uptime Kuma": C["rosewater"]}
+
+
 def color_overrides(mapping):
     return [{"matcher": {"id": "byRegexp", "options": "^" + name + r"\s*$"},
              "properties": [{"id": "color", "value": {"mode": "fixed", "fixedColor": hexc}}]}
@@ -37,6 +46,7 @@ def steps(*pairs):
 PCT_USED = steps((INFO, None), (WARN, 75), (BAD, 90))                  # CPU, memory, disk
 UPTIME = steps((BAD, None), (PENDING, 95), (HEALTHY, 99))              # uptime %: teal from 99, yellow from 95, red below
 STATUS = steps((BAD, None), (HEALTHY, 1), (PENDING, 2), (INFO, 3))     # monitor_status: 0 down 1 up 2 pending 3 maint
+UPTIME_M = steps((BAD, None), (PENDING, 95), (UP, 99))                 # same, with sapphire instead of teal
 
 
 def pos(x, y, w, h):

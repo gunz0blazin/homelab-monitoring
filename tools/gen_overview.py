@@ -34,22 +34,22 @@ D.add({"id": D.nid(), "type": "state-timeline", "title": "Service status", "data
                    "tooltip": {"mode": "single", "sort": "none"}}})
 
 # --- response times and 30 day uptime
-D.timeseries("Response time", "monitor_response_time", "{{monitor_name}}", pos(0, 13, 14, 9), "ms", vmin=0,
+D.timeseries("Response time", "monitor_response_time", "{{monitor_name}}", pos(0, 13, 14, 12), "ms", vmin=0,
              overrides=color_overrides(MONITOR_COLORS))
-D.bars("Uptime by service, 30 days", 'monitor_uptime_ratio{window="30d"} * 100', pos(14, 13, 10, 9), UPTIME,
+D.bars("Uptime by service, 30 days", 'monitor_uptime_ratio{window="30d"} * 100', pos(14, 13, 10, 12), UPTIME,
        unit="percent", vmin=90, vmax=100, decimals=2, legend="{{monitor_name}}")
 
 # --- hosts
 D.add({"id": D.nid(), "type": "row", "title": "Hosts (node exporter)", "collapsed": False,
-       "gridPos": pos(0, 22, 24, 1), "panels": []})
+       "gridPos": pos(0, 25, 24, 1), "panels": []})
 hosts = color_overrides(HOST_COLORS)
 D.timeseries("CPU used", '100 * (1 - (sum by (host) (rate(node_cpu_seconds_total{mode="idle"}[5m])) / sum by (host) (rate(node_cpu_seconds_total[5m]))))',
-             "{{host}}", pos(0, 23, 8, 8), "percent", 0, 100, hosts)
+             "{{host}}", pos(0, 26, 8, 8), "percent", 0, 100, hosts)
 D.timeseries("Memory used", '100 * (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes))',
-             "{{host}}", pos(8, 23, 8, 8), "percent", 0, 100, hosts)
+             "{{host}}", pos(8, 26, 8, 8), "percent", 0, 100, hosts)
 D.timeseries("Disk used (/)",
              '100 * (1 - (node_filesystem_avail_bytes{mountpoint="/",fstype!~"tmpfs|overlay"} / node_filesystem_size_bytes{mountpoint="/",fstype!~"tmpfs|overlay"}))',
-             "{{host}}", pos(16, 23, 8, 8), "percent", 0, 100, hosts)
+             "{{host}}", pos(16, 26, 8, 8), "percent", 0, 100, hosts)
 
 D.finish("grafana/dashboards/homelab-overview.json", "homelab-overview", "Homelab Overview",
          "Service status from Uptime Kuma, and host load from node exporters. Source: the homelab-monitoring repo.",

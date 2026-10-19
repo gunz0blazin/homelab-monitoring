@@ -1,6 +1,6 @@
 # homelab-monitoring
 
-Prometheus and Grafana config for my home lab, deployed by pushing to this repo.
+Prometheus, Grafana and Uptime Kuma for my home lab, deployed by pushing to this repo.
 
 ```
 push to main  ->  GitHub  ->  Docker host pulls every 5 min  ->  Prometheus reloads

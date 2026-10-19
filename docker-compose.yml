@@ -29,6 +29,16 @@ services:
       - prometheus
     restart: unless-stopped
 
+  uptime-kuma:
+    image: louislam/uptime-kuma:2.5.6
+    container_name: uptime-kuma
+    volumes:
+      - uptime-kuma-data:/app/data
+    ports:
+      - "3002:3001"    # 3001 is Homepage's
+    restart: unless-stopped
+
 volumes:
   prometheus-data:
   grafana-data:
+  uptime-kuma-data:

@@ -9,3 +9,6 @@ ntfy_url
 
 # Python bytecode from tools/
 __pycache__/
+
+# Python bytecode from tools/
+__pycache__/

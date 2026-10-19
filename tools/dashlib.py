@@ -50,6 +50,11 @@ def color_overrides(mapping, names=None):
     return out
 
 
+# Cool-family line colours for the calm trend charts (one hue family, not a rainbow).
+HOST_COLORS_COOL = {"proxmox": C["blue"], "pihole": C["lavender"], "dockers": C["sapphire"],
+                    "tailscale": C["mauve"], "plex": C["sky"], "qbittorrent": "#9399b2"}
+
+
 def host_overrides():
     """Colour and display name for every host series (legends, tooltips)."""
     return color_overrides(HOST_COLORS_M, HOST_NAMES)
@@ -142,6 +147,28 @@ class Dash:
             "targets": [self.target(expr, legend)],
             "fieldConfig": {"defaults": d, "overrides": overrides or []},
             "options": {"legend": legend_opts, "tooltip": {"mode": "multi", "sort": "desc"}}})
+
+    def calm_timeseries(self, title, targets, g, unit, vmin=None, vmax=None, overrides=None, desc="", decimals=0):
+        """Quiet trend chart for the detail rows: thin smooth line, soft fill, no legend, no points, no axis
+        border or grid. Hover shows every series. targets = [(expr, legend)]."""
+        d = {"unit": unit, "decimals": decimals, "color": {"mode": "palette-classic"},
+             "custom": {"drawStyle": "line", "lineWidth": 2, "fillOpacity": 12, "gradientMode": "opacity",
+                        "showPoints": "never", "lineInterpolation": "smooth", "spanNulls": True,
+                        "axisBorderShow": False, "axisGridShow": False, "axisLabel": "", "axisSoftMin": 0}}
+        if vmin is not None:
+            d["min"] = vmin
+        if vmax is not None:
+            d["max"] = vmax
+        tg = []
+        for i, (expr, legend) in enumerate(targets):
+            t = self.target(expr, legend)
+            t["refId"] = chr(65 + i)
+            tg.append(t)
+        return {"id": self.nid(), "type": "timeseries", "title": title, "description": desc, "datasource": DS,
+                "gridPos": g, "transparent": True, "targets": tg,
+                "fieldConfig": {"defaults": d, "overrides": overrides or []},
+                "options": {"legend": {"showLegend": False, "displayMode": "list", "placement": "bottom", "calcs": []},
+                            "tooltip": {"mode": "multi", "sort": "desc"}}}
 
     def hero(self, title, expr, g, up=None):
         """Full-width status banner: one phrase on a soft gradient fill. The only filled block on the board.

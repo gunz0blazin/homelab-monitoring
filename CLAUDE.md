@@ -29,11 +29,19 @@ Prometheus, Grafana and Uptime Kuma for the home lab, on the Docker host (`192.1
 - Grafana's other dashboards and data sources, and Uptime Kuma's monitors and notification settings, live in their own data volumes (made in each web UI), not in this repo. Back those volumes up before changing a major version.
 - Image versions are pinned (Prometheus `v3.15.0` and Grafana `13.0.2`, the versions running when this repo took over; Uptime Kuma `2.5.6`), so an update only happens when this repo changes. To update, change the tag in `docker-compose.yml` and push; Grafana upgrades its own database on start and can't be rolled back, so back up the Grafana volume first.
 
+## Homelab dashboard (Business Text cards)
+
+- Each card query is tagged with a `q` label (`label_replace(..., "q", "cpu", "", "")`), so the card code finds results by tag and never depends on frame order. Keep that when adding a query.
+- The plugin passes the rendered output through a markdown pass: the card helpers return **one line of HTML with no indentation or blank lines**, using only `div`, `span` and `b`, and colour and size come from classes (sanitization may drop `style` attributes). Bars have a static width class (`w0` to `w100`) so they are right without JavaScript; `after_render.js` only adds motion (bars and numbers animate from their previous value, kept in `window.__homelab`) and honours reduced-motion.
+- Colour rule is unchanged in spirit: one accent (blue), and warn or critical colour only for a value at 75% / 90%, a down or pending service, or an offline host. Four type sizes: 44, 22, 14, 12 (the narrow layout drops the two largest by a few px in `styles.css`).
+- Panel heights are fixed grid units, so a list that grows past its card scrolls inside it; raise `h` in `gen_home.py` if you add services or hosts.
+
 ## Layout
 
 - `docker-compose.yml`: Prometheus, Grafana and Uptime Kuma
 - `grafana/dashboards/`: dashboards as JSON, loaded into the **Homelab** folder in Grafana (provider in `grafana/provisioning/dashboards/`)
 - `tools/gen_overview.py`, `tools/gen_mobile.py` (shared helpers and the colour rules in `tools/dashlib.py`): generate those two dashboard files. Change the script, run `python3 tools/gen_overview.py` and `python3 tools/gen_mobile.py` from the repo root, and commit the scripts and the JSON together. **Homelab Overview** is the full desktop view; **Homelab Mobile** is a phone-sized one (big tiles, one bar per host, full-width panels) and each links to the other.
+- `tools/gen_home.py` plus `tools/ui/` (`common.js`, `header.js`, `hosts.js`, `services.js`, `after_render.js`, `styles.css`): generate `grafana/dashboards/homelab.json`, the single responsive **Homelab** dashboard (desktop and phone) that is meant to replace the two older ones. Its three cards are **Business Text** panels (plugin id `marcusolsson-dynamictext-panel`, must be installed in Grafana or they show "plugin not found"; it is not installed by this repo). Edit the sources in `tools/ui/`, run `python3 tools/gen_home.py`, then `node tools/ui/test_ui.js` (no dependencies; it tests the code as shipped in the JSON), and commit sources and JSON together.
 - `prometheus/prometheus.yml`: scrape jobs
 - `prometheus/targets/`: lists of targets for `file_sd_configs`
 - `deploy/monitoring-deploy`: the pull-validate-apply script (installed to `/usr/local/bin`)

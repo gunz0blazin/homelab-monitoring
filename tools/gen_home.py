@@ -61,11 +61,11 @@ MS_COLORS = [{"matcher": {"id": "byName", "options": "Average"}, "properties": [
 # Grid layouts (24 columns). Panel order is also the order they stack in on a narrow screen.
 LAYOUTS = {
     # phone first: full-width header, then hosts and services side by side on a wide screen, 2 x 2 charts
-    "mobile": {"header": pos(0, 0, 24, 6), "hosts": pos(0, 6, 14, 11), "services": pos(14, 6, 10, 11), "row": pos(0, 17, 24, 1),
-               "charts": [pos(0, 18, 12, 8), pos(12, 18, 12, 8), pos(0, 26, 12, 8), pos(12, 26, 12, 8)]},
+    "mobile": {"header": pos(0, 0, 24, 6), "hosts": pos(0, 6, 14, 12), "services": pos(14, 6, 10, 12), "row": pos(0, 18, 24, 1),
+               "charts": [pos(0, 19, 12, 8), pos(12, 19, 12, 8), pos(0, 27, 12, 8), pos(12, 27, 12, 8)]},
     # wide screens: slimmer header, hosts and services half and half, all four charts in one row
-    "desktop": {"header": pos(0, 0, 24, 5), "hosts": pos(0, 5, 12, 11), "services": pos(12, 5, 12, 11), "row": pos(0, 16, 24, 1),
-                "charts": [pos(0, 17, 6, 9), pos(6, 17, 6, 9), pos(12, 17, 6, 9), pos(18, 17, 6, 9)]},
+    "desktop": {"header": pos(0, 0, 24, 5), "hosts": pos(0, 5, 12, 12), "services": pos(12, 5, 12, 12), "row": pos(0, 17, 24, 1),
+                "charts": [pos(0, 18, 6, 9), pos(6, 18, 6, 9), pos(12, 18, 6, 9), pos(18, 18, 6, 9)]},
 }
 
 

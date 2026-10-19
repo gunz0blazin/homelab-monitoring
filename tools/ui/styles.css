@@ -13,14 +13,17 @@
   -webkit-font-smoothing: antialiased;
   color: var(--text);
   letter-spacing: -0.011em;
+  /* a card is a display, not a document: no text selection, no inner scrolling, vertical drags always scroll the page */
+  -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: pan-y pinch-zoom;
 }
 .hlw *, .hlw *::before, .hlw *::after { box-sizing: border-box; }
 .hl {
-  height: 100%; overflow-y: auto; scrollbar-width: none;
+  height: 100%; overflow: hidden;
   background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 22px 0;
   transition: background-color 300ms var(--ease), border-color 300ms var(--ease);
 }
-.hl::-webkit-scrollbar { display: none; }
 .hl:hover { background: rgba(205, 214, 244, 0.06); border-color: rgba(205, 214, 244, 0.12); }
 
 .ok, .sd.ok { --tone: var(--ok); }

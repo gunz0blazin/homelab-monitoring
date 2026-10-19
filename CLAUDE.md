@@ -34,7 +34,7 @@ Prometheus, Grafana and Uptime Kuma for the home lab, on the Docker host (`192.1
 - Each card query is tagged with a `q` label (`label_replace(..., "q", "cpu", "", "")`), so the card code finds results by tag and never depends on frame order. Keep that when adding a query.
 - The plugin passes the rendered output through a markdown pass: the card helpers return **one line of HTML with no indentation or blank lines**, using only `div`, `span` and `b`, and colour and size come from classes (sanitization may drop `style` attributes). Bars have a static width class (`w0` to `w100`) so they are right without JavaScript; `after_render.js` only adds motion (bars and numbers animate from their previous value, kept in `window.__homelab`) and honours reduced-motion.
 - Colour rule is unchanged in spirit: one accent (blue), and warn or critical colour only for a value at 75% / 90%, a down or pending service, or an offline host. Four type sizes: 44, 22, 14, 12 (the narrow layout drops the two largest by a few px in `styles.css`).
-- Panel heights are fixed grid units, so a list that grows past its card scrolls inside it; raise `h` in `gen_home.py` if you add services or hosts.
+- The cards never scroll internally and don't allow text selection (a card a few pixels too tall used to capture touches and scroll under the finger). Panel heights are fixed grid units and anything past the bottom is clipped, so the cards are sized for up to 6 hosts (row 56 px) and 9 services (row 38 px); raise `h` in `gen_home.py` if you add more. Native charts can't have drag-to-zoom turned off in Grafana, so that stays.
 
 ## Dashboard navigation
 

@@ -1,4 +1,21 @@
 # One entry per machine running prometheus-node-exporter (port 9100).
-# Prometheus picks up changes to this file within a minute.
+# Prometheus picks up changes to this file within a minute; no restart needed.
+# `host` is what the Grafana panels show as the machine's name.
+
+- targets: ["192.168.20.10:9100"]
+  labels: {host: proxmox}
+
+- targets: ["192.168.20.11:9100"]
+  labels: {host: pihole}
+
+- targets: ["192.168.20.13:9100"]
+  labels: {host: dockers}
+
 - targets: ["192.168.20.14:9100"]
   labels: {host: tailscale}
+
+- targets: ["192.168.20.20:9100"]
+  labels: {host: plex}
+
+- targets: ["192.168.20.21:9100"]
+  labels: {host: qbittorrent}

@@ -55,4 +55,4 @@ D.timeseries("Response time", "monitor_response_time", "{{monitor_name}}", pos(0
 
 D.finish("grafana/dashboards/homelab-mobile.json", "homelab-mobile", "Homelab Mobile",
          "Phone-sized view of Homelab Overview: one status banner, a 6-hour status grid, and host gauges. Source: the homelab-monitoring repo.",
-         ["homelab", "mobile"], ("Full dashboard", "/d/homelab-overview"), hide_ds=True)
+         ["homelab", "mobile"], nav_links("homelab-mobile"), hide_ds=True)

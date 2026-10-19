@@ -1,8 +1,9 @@
 {
   "uid": "homelab",
-  "title": "Homelab",
+  "title": "Homelab Testing Mobile",
   "tags": [
-    "homelab"
+    "homelab",
+    "testing"
   ],
   "timezone": "browser",
   "schemaVersion": 39,
@@ -14,7 +15,7 @@
     "from": "now-6h",
     "to": "now"
   },
-  "description": "Status, hosts and services for the home lab. Source: the homelab-monitoring repo.",
+  "description": "Status, hosts and services for the home lab, laid out for a phone. Source: the homelab-monitoring repo.",
   "templating": {
     "list": [
       {
@@ -36,9 +37,33 @@
   },
   "links": [
     {
-      "title": "Classic view",
+      "title": "Overview",
       "type": "link",
       "url": "/d/homelab-overview",
+      "icon": "dashboard",
+      "targetBlank": false,
+      "asDropdown": false,
+      "includeVars": false,
+      "keepTime": false,
+      "tags": [],
+      "tooltip": ""
+    },
+    {
+      "title": "Mobile",
+      "type": "link",
+      "url": "/d/homelab-mobile",
+      "icon": "dashboard",
+      "targetBlank": false,
+      "asDropdown": false,
+      "includeVars": false,
+      "keepTime": false,
+      "tags": [],
+      "tooltip": ""
+    },
+    {
+      "title": "Testing desktop",
+      "type": "link",
+      "url": "/d/homelab-desktop",
       "icon": "dashboard",
       "targetBlank": false,
       "asDropdown": false,
@@ -323,7 +348,7 @@
       }
     },
     {
-      "id": 8,
+      "id": 4,
       "type": "row",
       "title": "Trends",
       "collapsed": false,
@@ -336,7 +361,7 @@
       "panels": []
     },
     {
-      "id": 4,
+      "id": 5,
       "type": "timeseries",
       "title": "Response time",
       "description": "Average and slowest check time across all services.",
@@ -440,7 +465,7 @@
       }
     },
     {
-      "id": 5,
+      "id": 6,
       "type": "timeseries",
       "title": "CPU",
       "description": "",
@@ -620,7 +645,7 @@
       }
     },
     {
-      "id": 6,
+      "id": 7,
       "type": "timeseries",
       "title": "Memory",
       "description": "",
@@ -800,7 +825,7 @@
       }
     },
     {
-      "id": 7,
+      "id": 8,
       "type": "timeseries",
       "title": "Disk",
       "description": "",

@@ -55,4 +55,4 @@ D.timeseries("Disk usage",
 
 D.finish("grafana/dashboards/homelab-overview.json", "homelab-overview", "Homelab Overview",
          "Service status from Uptime Kuma, and host load. Source: the homelab-monitoring repo.",
-         ["homelab"], ("Mobile view", "/d/homelab-mobile"))
+         ["homelab"], nav_links("homelab-overview"))

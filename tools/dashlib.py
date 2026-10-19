@@ -71,6 +71,18 @@ STATUS = steps((BAD, None), (HEALTHY, 1), (PENDING, 2), (INFO, 3))     # monitor
 UPTIME_M = steps((BAD, None), (PENDING, 95), (UP, 99))                 # same, with sapphire instead of teal
 
 
+# Every dashboard shows a button for each of the others, so you can flip between them from anywhere.
+# Add a new dashboard here and regenerate all of them.
+NAV = [("homelab-overview", "Overview", "/d/homelab-overview"),
+       ("homelab-mobile", "Mobile", "/d/homelab-mobile"),
+       ("homelab", "Testing mobile", "/d/homelab"),
+       ("homelab-desktop", "Testing desktop", "/d/homelab-desktop")]
+
+
+def nav_links(current_uid):
+    return [(title, url) for uid, title, url in NAV if uid != current_uid]
+
+
 def pos(x, y, w, h):
     return {"x": x, "y": y, "w": w, "h": h}
 
@@ -276,8 +288,9 @@ class Dash:
                                      "query": "prometheus", "current": {}, "hide": 2 if hide_ds else 0,
                                      "includeAll": False, "multi": False, "options": [], "refresh": 1}]},
             "annotations": {"list": []},
-            "links": [{"title": link[0], "type": "link", "url": link[1], "icon": "dashboard", "targetBlank": False,
-                       "asDropdown": False, "includeVars": False, "keepTime": False, "tags": [], "tooltip": ""}],
+            "links": [{"title": t, "type": "link", "url": u, "icon": "dashboard", "targetBlank": False,
+                       "asDropdown": False, "includeVars": False, "keepTime": False, "tags": [], "tooltip": ""}
+                      for t, u in (link if isinstance(link, list) else [link])],
             "panels": self.panels}
         with open(path, "w") as f:
             json.dump(dashboard, f, indent=2)

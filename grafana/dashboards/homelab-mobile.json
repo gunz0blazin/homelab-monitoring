@@ -617,7 +617,7 @@
     {
       "id": 5,
       "type": "table",
-      "title": "hosts",
+      "title": "host health",
       "datasource": {
         "type": "prometheus",
         "uid": "${datasource}"

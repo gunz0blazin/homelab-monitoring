@@ -36,7 +36,7 @@ D.bars("Uptime by service, 30 days", 'monitor_uptime_ratio{window="30d"} * 100',
        title_size=12, value_size=14)
 
 # --- hosts: gauges first, trends underneath
-D.add({"id": D.nid(), "type": "row", "title": "Hosts (node exporter)", "collapsed": False,
+D.add({"id": D.nid(), "type": "row", "title": "Host health", "collapsed": False,
        "gridPos": pos(0, 28, 24, 1), "panels": []})
 D.host_table("hosts", [
     ("CPU", 'max by (host) (100 * (1 - (sum by (host) (rate(node_cpu_seconds_total{mode="idle"}[5m])) / sum by (host) (rate(node_cpu_seconds_total[5m])))))', C["blue"]),

@@ -35,7 +35,7 @@ D.multi_stat("uptime", [
 D.status_history("last 6 hours", "monitor_status", "{{monitor_name}}", pos(0, 13, 24, 11))
 
 # 5. one row per host, CPU / memory / disk as gradient gauges
-D.host_table("hosts", [
+D.host_table("host health", [
     ("CPU", 'max by (host) (100 * (1 - (sum by (host) (rate(node_cpu_seconds_total{mode="idle"}[5m])) / sum by (host) (rate(node_cpu_seconds_total[5m])))))', C["blue"]),
     ("Mem", 'max by (host) (100 * (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)))', C["mauve"]),
     ("Disk", 'max by (host) (100 * (1 - (node_filesystem_avail_bytes{mountpoint="/",fstype!~"tmpfs|overlay"} / node_filesystem_size_bytes{mountpoint="/",fstype!~"tmpfs|overlay"})))', C["lavender"]),

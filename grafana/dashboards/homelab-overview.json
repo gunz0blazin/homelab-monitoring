@@ -964,7 +964,7 @@
     {
       "id": 8,
       "type": "row",
-      "title": "Hosts (node exporter)",
+      "title": "Host health",
       "collapsed": false,
       "gridPos": {
         "x": 0,

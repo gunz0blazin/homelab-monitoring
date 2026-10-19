@@ -16,7 +16,7 @@ Prometheus and Grafana for the home lab, on the Docker host (`192.168.20.13`; Pr
 - Mount config as the **folder** `./prometheus`, never a single file: a deploy replaces files, and a single-file bind mount keeps showing the old copy.
 - Keep a Prometheus config that `promtool check config` accepts; the server runs it on every commit and skips a commit that fails, keeping the last good version, and sends one ntfy message.
 - Grafana's dashboards and data sources live in its own data volume (made in the web UI), not in this repo.
-- Prefer pinned image versions to `latest`, so an update only happens when this repo changes.
+- Image versions are pinned (Prometheus `v3.15.0`, Grafana `13.0.2`, the versions that were running when this repo took over), so an update only happens when this repo changes. To update, change the tag in `docker-compose.yml` and push; Grafana upgrades its own database on start and can't be rolled back, so back up the Grafana volume first.
 
 ## Layout
 

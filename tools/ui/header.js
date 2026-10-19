@@ -9,8 +9,12 @@ function renderHeader(data) {
   const downNames = bad.filter((r) => num(r) === 0).map((r) => String(r.monitor_name).trim());
   const waitNames = bad.filter((r) => num(r) !== 0).map((r) => String(r.monitor_name).trim());
   const hosts = only(R, "hup");
-  const offline = hosts.filter((r) => num(r) === 0).map((r) => hostName(r.host));
-  const hostsOn = hosts.length - offline.length;
+  // a host that is offline because its own service is down or pending is the same story: say it once, as the service
+  const norm = (s) => String(s).toLowerCase().replace(/[^a-z0-9]/g, "");
+  const flagged = downNames.concat(waitNames).map(norm);
+  const covered = (name) => flagged.some((f) => f.startsWith(norm(name)) || norm(name).startsWith(f));
+  const offline = hosts.filter((r) => num(r) === 0).map((r) => hostName(r.host)).filter((n) => !covered(n));
+  const hostsOn = hosts.filter((r) => num(r) !== 0).length;
 
   let state = "ok", head = "All systems operational";
   if (downNames.length || down > 0) { state = "crit"; head = "Service outage"; }

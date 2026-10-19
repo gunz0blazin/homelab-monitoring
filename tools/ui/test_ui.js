@@ -101,6 +101,12 @@ test("header: pending service and offline host", () => {
   assert(out.includes("5") && html(out).querySelector(".k_hst").textContent === "5");
 });
 
+test("header: a pending service does not also say its host is offline", () => {
+  const out = load("header")(headerData({ pend: 1, up: 8, svc: (n) => (n === "qBittorrent" ? 2 : 1), hup: (h) => (h === "qbittorrent" ? 0 : 1) }));
+  assert(out.includes("qBittorrent pending") && !out.includes("offline"), out);
+  assert.strictEqual(html(out).querySelector(".k_hst").textContent, "5", "the host count still shows 5 of 6");
+});
+
 test("header: no data yet does not throw", () => {
   const out = load("header")([]);
   assert(out.includes("All systems operational"));

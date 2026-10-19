@@ -18,6 +18,8 @@ scrape_configs:
   # takes an API key as the password. The key is a file on the host
   # (/etc/monitoring-deploy/secrets/kuma_api_key), never in git.
   - job_name: uptime-kuma
+    scrape_interval: 10s    # Kuma checks every 20 s; 10 s keeps the dashboards close behind it
+    scrape_timeout: 5s
     basic_auth:
       username: ""
       password_file: /secrets/kuma_api_key

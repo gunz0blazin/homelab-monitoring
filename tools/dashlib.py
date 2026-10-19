@@ -112,7 +112,7 @@ class Dash:
             "2": {"text": "PENDING", "color": PENDING, "index": 2},
             "3": {"text": "MAINT", "color": INFO, "index": 3}}}]
 
-    def finish(self, path, uid, title, description, tags, link, refresh="30s", hide_ds=False):
+    def finish(self, path, uid, title, description, tags, link, refresh="10s", hide_ds=False):
         dashboard = {
             "uid": uid, "title": title, "tags": tags, "timezone": "browser", "schemaVersion": 39, "version": 1,
             "editable": True, "graphTooltip": 1, "refresh": refresh, "time": {"from": "now-6h", "to": "now"},

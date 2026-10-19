@@ -84,7 +84,7 @@ class Dash:
             "targets": [self.target(expr, legend, instant=True)],
             "fieldConfig": {"defaults": {"unit": unit, "decimals": decimals, "min": vmin, "max": vmax,
                                          "color": {"mode": "thresholds"}, "thresholds": thresholds}, "overrides": []},
-            "options": {"orientation": "horizontal", "displayMode": "gradient", "showUnfilled": True,
+            "options": {"orientation": "horizontal", "displayMode": "basic", "showUnfilled": True,
                         "valueMode": "color", "namePlacement": "top", "minVizHeight": 16, "minVizWidth": 8,
                         "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": False}}})
 

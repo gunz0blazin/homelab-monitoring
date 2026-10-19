@@ -829,7 +829,7 @@
       },
       "options": {
         "orientation": "horizontal",
-        "displayMode": "gradient",
+        "displayMode": "basic",
         "showUnfilled": true,
         "valueMode": "color",
         "namePlacement": "top",

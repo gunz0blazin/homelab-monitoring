@@ -13,6 +13,7 @@ services:
       # The folder, not the single file: a deploy replaces files, and a single-file
       # bind mount would keep showing the old copy.
       - ./prometheus:/etc/prometheus:ro
+      - /etc/monitoring-deploy/secrets:/secrets:ro    # credential files named in prometheus.yml; not in git
       - prometheus-data:/prometheus
     ports:
       - "9090:9090"

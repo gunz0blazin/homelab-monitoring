@@ -13,3 +13,13 @@ scrape_configs:
       - files:
           - /etc/prometheus/targets/nodes.yml
         refresh_interval: 1m
+
+  # Uptime Kuma's own metrics, reached over the compose network. Kuma ignores the username and
+  # takes an API key as the password. The key is a file on the host
+  # (/etc/monitoring-deploy/secrets/kuma_api_key), never in git.
+  - job_name: uptime-kuma
+    basic_auth:
+      username: ""
+      password_file: /secrets/kuma_api_key
+    static_configs:
+      - targets: ['uptime-kuma:3001']

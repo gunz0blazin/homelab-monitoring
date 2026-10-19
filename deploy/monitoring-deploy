@@ -13,6 +13,8 @@ APP=${APP:-/opt/monitoring-repo}
 SRC=$APP/repo
 STATE=$APP/state
 PROJECT=monitoring    # must stay "monitoring": it keeps the existing data volumes attached
+READY_TRIES=${READY_TRIES:-30}    # how long to wait for Prometheus after a deploy: 30 x 2 s
+READY_SLEEP=${READY_SLEEP:-2}
 
 [ -r "$CONF/deploy.env" ] || { echo "missing $CONF/deploy.env (run deploy/bootstrap.sh)" >&2; exit 1; }
 . "$CONF/deploy.env"    # REPO_URL, BRANCH
@@ -81,7 +83,15 @@ except yaml.YAMLError as e:
 
   git -C "$SRC" reset --quiet --hard "origin/$BRANCH" || exit 1
   compose up -d --remove-orphans || exit 1
-  # Prometheus reads its config on SIGHUP; harmless when nothing changed.
+
+  # Prometheus only handles SIGHUP (reload) once it has finished starting; sent earlier, the
+  # signal kills it (exit 129). So wait until it reports ready, and only then reload.
+  i=0
+  until docker exec prometheus wget -q -O /dev/null http://localhost:9090/-/ready 2>/dev/null; do
+    i=$((i + 1))
+    [ "$i" -ge "$READY_TRIES" ] && { echo "prometheus not ready after the deploy"; exit 1; }
+    sleep "$READY_SLEEP"
+  done
   compose kill -s HUP prometheus >/dev/null 2>&1 || true
 )
 

@@ -15,6 +15,10 @@ jobs:
           pip install --quiet yamllint
           yamllint -d '{extends: default, rules: {line-length: disable, document-start: disable, truthy: disable, indentation: {spaces: consistent, indent-sequences: consistent}}}' docker-compose.yml prometheus
 
+      - name: Grafana dashboards are valid JSON
+        run: |
+          python3 -c "import glob, json; [json.load(open(f)) for f in glob.glob('grafana/dashboards/*.json')]"
+
       - name: Compose file is valid
         run: docker compose -f docker-compose.yml config -q
 

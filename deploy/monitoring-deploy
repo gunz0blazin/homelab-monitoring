@@ -82,6 +82,12 @@ except yaml.YAMLError as e:
     done
   fi
 
+  for f in "$TMP"/grafana/dashboards/*.json; do
+    [ -e "$f" ] || continue
+    python3 -c 'import json, sys; json.load(open(sys.argv[1]))' "$f" 2>/dev/null \
+      || { echo "invalid JSON in ${f#"$TMP"/}"; exit 1; }
+  done
+
   docker compose -f "$TMP/docker-compose.yml" config -q || { echo "invalid docker-compose.yml"; exit 1; }
 
   # Prometheus's own check, using the same image the stack runs.

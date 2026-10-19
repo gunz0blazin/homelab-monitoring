@@ -24,6 +24,9 @@ services:
     container_name: grafana
     volumes:
       - grafana-data:/var/lib/grafana
+      # Only the dashboards provisioning folder, so anything made in the UI is left alone.
+      - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./grafana/dashboards:/etc/grafana/dashboards:ro
     ports:
       - "3000:3000"
     depends_on:

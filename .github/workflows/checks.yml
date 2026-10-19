@@ -21,7 +21,10 @@ jobs:
       - name: Prometheus accepts the config
         run: |
           IMG=$(docker compose -f docker-compose.yml config --images | grep -m1 prometheus)
-          docker run --rm --entrypoint promtool -v "$PWD/prometheus:/etc/prometheus:ro" "$IMG" \
+          # The config points at credential files that exist only on the host; give promtool dummies.
+          mkdir -p "$RUNNER_TEMP/secrets" && echo dummy > "$RUNNER_TEMP/secrets/kuma_api_key"
+          docker run --rm --entrypoint promtool -v "$PWD/prometheus:/etc/prometheus:ro" \
+            -v "$RUNNER_TEMP/secrets:/secrets:ro" "$IMG" \
             check config /etc/prometheus/prometheus.yml
 
       - name: Shell scripts parse

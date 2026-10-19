@@ -8,6 +8,16 @@
 # stack keeps running the last good one.
 set -eu
 
+# Run from a temporary copy: the deploy replaces this file (git reset) while it is running,
+# and the shell reads a script as it goes. /usr/local/bin/monitoring-deploy is a symlink to
+# the repo copy, so a script change takes effect on the next run with no manual step.
+if [ -z "${MONITORING_DEPLOY_COPY:-}" ]; then
+  tmp=$(mktemp)
+  cp "$0" "$tmp"
+  MONITORING_DEPLOY_COPY=1 exec sh "$tmp" "$@"
+fi
+rm -f "$0"
+
 CONF=${CONF:-/etc/monitoring-deploy}
 APP=${APP:-/opt/monitoring-repo}
 SRC=$APP/repo
@@ -77,7 +87,8 @@ except yaml.YAMLError as e:
   # Prometheus's own check, using the same image the stack runs.
   IMG=$(docker compose -f "$TMP/docker-compose.yml" config --images | grep -m1 prometheus || true)
   if [ -n "$IMG" ]; then
-    docker run --rm --entrypoint promtool -v "$TMP/prometheus:/etc/prometheus:ro" "$IMG" \
+    docker run --rm --entrypoint promtool -v "$TMP/prometheus:/etc/prometheus:ro" \
+      -v "$CONF/secrets:/secrets:ro" "$IMG" \
       check config /etc/prometheus/prometheus.yml || { echo "promtool rejected prometheus.yml"; exit 1; }
   fi
 

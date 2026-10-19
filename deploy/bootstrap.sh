@@ -39,6 +39,7 @@ apt-get install -y git curl python3-yaml
 
 echo "==> Settings in $CONF"
 install -d -m 0700 "$CONF"
+install -d -m 0755 "$CONF/secrets"    # credential files Prometheus reads; see CLAUDE.md
 if [ ! -e "$CONF/deploy.env" ]; then
   REPO_URL_VALUE=${REPO_URL:-}
   if [ -z "$REPO_URL_VALUE" ]; then
@@ -67,6 +68,8 @@ systemctl daemon-reload
 
 echo "==> First deploy"
 /usr/local/bin/monitoring-deploy
+# From here on the command is the repo's own copy, so script changes need no re-install.
+ln -sf /opt/monitoring-repo/repo/deploy/monitoring-deploy /usr/local/bin/monitoring-deploy
 systemctl enable --now monitoring-deploy.timer
 
 echo

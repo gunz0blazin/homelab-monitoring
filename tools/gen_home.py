@@ -90,4 +90,4 @@ D.add({"id": D.nid(), "type": "row", "title": "Trends", "collapsed": True, "grid
 
 D.finish("grafana/dashboards/homelab.json", "homelab", "Homelab",
          "Status, hosts and services for the home lab. Source: the homelab-monitoring repo.",
-         ["homelab"], ("Classic view", "/d/homelab-overview"), refresh="15s", hide_ds=True)
+         ["homelab"], ("Classic view", "/d/homelab-overview"), refresh="5s", hide_ds=True)

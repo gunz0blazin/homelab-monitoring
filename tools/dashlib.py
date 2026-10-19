@@ -35,7 +35,7 @@ def steps(*pairs):
 
 # healthy-until-it-isn't thresholds
 PCT_USED = steps((INFO, None), (WARN, 75), (BAD, 90))                  # CPU, memory, disk
-UPTIME = steps((BAD, None), (PENDING, 99), (HEALTHY, 99.9))            # uptime percentages
+UPTIME = steps((BAD, None), (PENDING, 95), (HEALTHY, 99))              # uptime %: teal from 99, yellow from 95, red below
 STATUS = steps((BAD, None), (HEALTHY, 1), (PENDING, 2), (INFO, 3))     # monitor_status: 0 down 1 up 2 pending 3 maint
 
 

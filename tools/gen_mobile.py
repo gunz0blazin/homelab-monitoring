@@ -20,7 +20,7 @@ D.stat("Uptime 30d", 'avg(monitor_uptime_ratio{window="30d"}) * 100', pos(12, 4,
 
 # one line per service: its name, and UP or DOWN in colour
 board = D.stat("Services", "monitor_status", pos(0, 7, 24, 12), thresholds=STATUS, instant=True,
-               legend="{{monitor_name}}", text="value_and_name", size=28)
+               legend="{{monitor_name}}", text="value_and_name", size=20)
 board["fieldConfig"]["defaults"]["mappings"] = D.status_mappings()
 
 D.bars("CPU", '100 * (1 - (sum by (host) (rate(node_cpu_seconds_total{mode="idle"}[5m])) / sum by (host) (rate(node_cpu_seconds_total[5m]))))',

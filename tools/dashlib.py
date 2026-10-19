@@ -32,10 +32,27 @@ MONITOR_COLORS_M = {"420NAS": C["pink"], "Grafana": C["peach"], "Home Assistant"
                     "qBittorent": C["blue"], "Uptime Kuma": C["rosewater"]}
 
 
-def color_overrides(mapping):
-    return [{"matcher": {"id": "byRegexp", "options": "^" + name + r"\s*$"},
-             "properties": [{"id": "color", "value": {"mode": "fixed", "fixedColor": hexc}}]}
-            for name, hexc in mapping.items()]
+# How each host's `host` label (prometheus/targets/nodes.yml) is shown on the dashboards. The labels stay
+# lowercase in Prometheus so history isn't split; only the display changes. A host that isn't listed here
+# is shown as its raw label: add it (and a colour in HOST_COLORS_M).
+HOST_NAMES = {"proxmox": "Proxmox", "pihole": "Pi-hole", "dockers": "Docker", "tailscale": "Tailscale",
+              "plex": "Plex", "qbittorrent": "qBittorrent"}
+
+
+def color_overrides(mapping, names=None):
+    """Fixed line colour per series, matched by name. names optionally maps a series name to a display name."""
+    out = []
+    for name, hexc in mapping.items():
+        props = [{"id": "color", "value": {"mode": "fixed", "fixedColor": hexc}}]
+        if names and name in names:
+            props.append({"id": "displayName", "value": names[name]})
+        out.append({"matcher": {"id": "byRegexp", "options": "^" + name + r"\s*$"}, "properties": props})
+    return out
+
+
+def host_overrides():
+    """Colour and display name for every host series (legends, tooltips)."""
+    return color_overrides(HOST_COLORS_M, HOST_NAMES)
 
 
 def steps(*pairs):
@@ -91,14 +108,14 @@ class Dash:
                         "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": False}}})
 
     def bars(self, title, expr, g, thresholds, unit="percent", vmin=0, vmax=100, decimals=0, legend="{{host}}",
-             display="basic", overrides=None, transparent=False, title_size=13, value_size=16):
+             display="basic", overrides=None, transparent=False, title_size=13, value_size=16, desc=""):
         defaults = {"unit": unit, "decimals": decimals, "min": vmin}
         if vmax is not None:
             defaults["max"] = vmax
         defaults["color"] = {"mode": "thresholds"}
         defaults["thresholds"] = thresholds
         panel = self.add({
-            "id": self.nid(), "type": "bargauge", "title": title, "datasource": DS, "gridPos": g,
+            "id": self.nid(), "type": "bargauge", "title": title, "description": desc, "datasource": DS, "gridPos": g,
             "targets": [self.target(expr, legend, instant=True)],
             "fieldConfig": {"defaults": defaults, "overrides": overrides or []},
             "options": {"orientation": "horizontal", "displayMode": display, "showUnfilled": True,
@@ -109,10 +126,11 @@ class Dash:
             panel["transparent"] = True
         return panel
 
-    def timeseries(self, title, expr, legend, g, unit, vmin=None, vmax=None, overrides=None, table_legend=True):
+    def timeseries(self, title, expr, legend, g, unit, vmin=None, vmax=None, overrides=None, table_legend=True, desc=""):
         d = {"unit": unit, "color": {"mode": "palette-classic"},
              "custom": {"drawStyle": "line", "lineWidth": 2, "fillOpacity": 14, "gradientMode": "opacity",
-                        "showPoints": "never", "lineInterpolation": "smooth", "spanNulls": True}}
+                        "showPoints": "never", "lineInterpolation": "smooth", "spanNulls": True,
+                        "axisBorderShow": False, "axisSoftMin": 0}}
         if vmin is not None:
             d["min"] = vmin
         if vmax is not None:
@@ -120,7 +138,7 @@ class Dash:
         legend_opts = ({"displayMode": "table", "placement": "bottom", "showLegend": True, "calcs": ["mean", "max"]}
                        if table_legend else {"displayMode": "list", "placement": "bottom", "showLegend": False, "calcs": []})
         return self.add({
-            "id": self.nid(), "type": "timeseries", "title": title, "datasource": DS, "gridPos": g,
+            "id": self.nid(), "type": "timeseries", "title": title, "description": desc, "datasource": DS, "gridPos": g,
             "targets": [self.target(expr, legend)],
             "fieldConfig": {"defaults": d, "overrides": overrides or []},
             "options": {"legend": legend_opts, "tooltip": {"mode": "multi", "sort": "desc"}}})
@@ -137,12 +155,12 @@ class Dash:
             "targets": [self.target(expr, "", instant=True)],
             "fieldConfig": {"defaults": {"unit": "none", "color": {"mode": "thresholds"},
                                          "thresholds": steps((up, None)),
-                                         "mappings": [rng(0, 0.5, "ALL SYSTEMS UP", up, 0),
-                                                      rng(0.5, 9.5, "DEGRADED", PENDING, 1),
-                                                      rng(9.5, 1000000, "OUTAGE", BAD, 2)]}, "overrides": []},
+                                         "mappings": [rng(0, 0.5, "All systems operational", up, 0),
+                                                      rng(0.5, 9.5, "Degraded performance", PENDING, 1),
+                                                      rng(9.5, 1000000, "Service outage", BAD, 2)]}, "overrides": []},
             "options": {"colorMode": "background", "graphMode": "none", "justifyMode": "center",
                         "orientation": "auto", "textMode": "value", "wideLayout": True,
-                        "text": {"valueSize": 30},
+                        "text": {"valueSize": 26},
                         "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": False}}})
 
     def multi_stat(self, title, series, g, size=38):
@@ -168,10 +186,10 @@ class Dash:
                         "text": {"valueSize": size, "titleSize": 12},
                         "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": False}}})
 
-    def status_history(self, title, expr, legend, g, points=40):
+    def status_history(self, title, expr, legend, g, points=40, desc=""):
         """One row per monitor, one cell per time bucket, coloured by status. Replaces a plain list of UP/DOWN."""
         return self.add({
-            "id": self.nid(), "type": "status-history", "title": title, "datasource": DS, "gridPos": g,
+            "id": self.nid(), "type": "status-history", "title": title, "description": desc, "datasource": DS, "gridPos": g,
             "transparent": True, "maxDataPoints": points, "targets": [self.target(expr, legend)],
             "fieldConfig": {"defaults": {"color": {"mode": "thresholds"},
                                          "thresholds": steps((BAD, None), (self.healthy, 1), (PENDING, 2), (self.maint, 3)),
@@ -181,17 +199,22 @@ class Dash:
                         "legend": {"showLegend": False, "displayMode": "list", "placement": "bottom"},
                         "tooltip": {"mode": "single", "sort": "none"}}})
 
-    def host_table(self, title, cols, g):
-        """One row per host, one gradient gauge cell per metric. cols = [(name, expr_by_host, base_colour)]."""
+    def host_table(self, title, cols, g, desc=""):
+        """One row per host, one gradient gauge cell per metric. cols = [(name, expr_by_host, base_colour)].
+        Host names are shown through HOST_NAMES (Proxmox, Pi-hole, ...); the underlying label is unchanged."""
         targets = []
         for i, (name, expr, _) in enumerate(cols):
             targets.append({"datasource": DS, "expr": expr, "format": "table", "instant": True, "range": False,
                             "refId": chr(65 + i)})
         keep = ["host"] + [f"Value #{chr(65 + i)}" for i in range(len(cols))]
         rename = {f"Value #{chr(65 + i)}": c[0] for i, c in enumerate(cols)}
-        rename["host"] = "host"
-        order = {n: i for i, n in enumerate(["host"] + [c[0] for c in cols])}
-        overrides = []
+        rename["host"] = "Host"
+        # `indexByName` is keyed by the original names (host, Value #A, ...), so key it that way
+        order = {"host": 0, **{f"Value #{chr(65 + i)}": i + 1 for i in range(len(cols))}}
+        value_map = {raw: {"text": shown, "index": i} for i, (raw, shown) in enumerate(HOST_NAMES.items())}
+        overrides = [{"matcher": {"id": "byName", "options": "Host"}, "properties": [
+            {"id": "mappings", "value": [{"type": "value", "options": value_map}]},
+            {"id": "custom.width", "value": 130}]}]
         for name, _, base in cols:
             overrides.append({"matcher": {"id": "byName", "options": name}, "properties": [
                 {"id": "unit", "value": "percent"}, {"id": "min", "value": 0}, {"id": "max", "value": 100},
@@ -199,7 +222,8 @@ class Dash:
                 {"id": "thresholds", "value": steps((base, None), (WARN, 75), (BAD, 90))},
                 {"id": "custom.cellOptions", "value": {"type": "gauge", "mode": "gradient", "valueDisplayMode": "text"}}]})
         return self.add({
-            "id": self.nid(), "type": "table", "title": title, "datasource": DS, "gridPos": g, "transparent": True,
+            "id": self.nid(), "type": "table", "title": title, "description": desc, "datasource": DS, "gridPos": g,
+            "transparent": True,
             "targets": targets,
             "transformations": [
                 {"id": "joinByField", "options": {"byField": "host", "mode": "outer"}},
@@ -211,10 +235,10 @@ class Dash:
 
     def status_mappings(self):
         return [{"type": "value", "options": {
-            "0": {"text": "DOWN", "color": BAD, "index": 0},
-            "1": {"text": "UP", "color": self.healthy, "index": 1},
-            "2": {"text": "PENDING", "color": PENDING, "index": 2},
-            "3": {"text": "MAINT", "color": self.maint, "index": 3}}}]
+            "0": {"text": "Down", "color": BAD, "index": 0},
+            "1": {"text": "Up", "color": self.healthy, "index": 1},
+            "2": {"text": "Pending", "color": PENDING, "index": 2},
+            "3": {"text": "Maintenance", "color": self.maint, "index": 3}}}]
 
     def finish(self, path, uid, title, description, tags, link, refresh="10s", hide_ds=False):
         dashboard = {

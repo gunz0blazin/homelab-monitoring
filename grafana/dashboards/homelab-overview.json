@@ -14,7 +14,7 @@
     "from": "now-6h",
     "to": "now"
   },
-  "description": "Service status from Uptime Kuma, and host load from node exporters. Source: the homelab-monitoring repo.",
+  "description": "Service status from Uptime Kuma, and host load. Source: the homelab-monitoring repo.",
   "templating": {
     "list": [
       {
@@ -99,7 +99,7 @@
                 "from": 0,
                 "to": 0.5,
                 "result": {
-                  "text": "ALL SYSTEMS UP",
+                  "text": "All systems operational",
                   "color": "#cba6f7",
                   "index": 0
                 }
@@ -111,7 +111,7 @@
                 "from": 0.5,
                 "to": 9.5,
                 "result": {
-                  "text": "DEGRADED",
+                  "text": "Degraded performance",
                   "color": "#f9e2af",
                   "index": 1
                 }
@@ -123,7 +123,7 @@
                 "from": 9.5,
                 "to": 1000000,
                 "result": {
-                  "text": "OUTAGE",
+                  "text": "Service outage",
                   "color": "#f38ba8",
                   "index": 2
                 }
@@ -141,7 +141,7 @@
         "textMode": "value",
         "wideLayout": true,
         "text": {
-          "valueSize": 30
+          "valueSize": 26
         },
         "reduceOptions": {
           "calcs": [
@@ -155,7 +155,7 @@
     {
       "id": 2,
       "type": "stat",
-      "title": "services",
+      "title": "Services",
       "datasource": {
         "type": "prometheus",
         "uid": "${datasource}"
@@ -353,7 +353,7 @@
     {
       "id": 3,
       "type": "stat",
-      "title": "uptime",
+      "title": "Uptime",
       "datasource": {
         "type": "prometheus",
         "uid": "${datasource}"
@@ -514,7 +514,7 @@
     {
       "id": 4,
       "type": "stat",
-      "title": "DNS time",
+      "title": "DNS response",
       "description": "How long the Pi-hole takes to answer",
       "datasource": {
         "type": "prometheus",
@@ -588,7 +588,8 @@
     {
       "id": 5,
       "type": "status-history",
-      "title": "last 6 hours",
+      "title": "Service status, last 6 hours",
+      "description": "One row per service. Each cell is about 6 minutes; blue is up, red is down, yellow is retrying.",
       "datasource": {
         "type": "prometheus",
         "uid": "${datasource}"
@@ -643,22 +644,22 @@
               "type": "value",
               "options": {
                 "0": {
-                  "text": "DOWN",
+                  "text": "Down",
                   "color": "#f38ba8",
                   "index": 0
                 },
                 "1": {
-                  "text": "UP",
+                  "text": "Up",
                   "color": "#74c7ec",
                   "index": 1
                 },
                 "2": {
-                  "text": "PENDING",
+                  "text": "Pending",
                   "color": "#f9e2af",
                   "index": 2
                 },
                 "3": {
-                  "text": "MAINT",
+                  "text": "Maintenance",
                   "color": "#b4befe",
                   "index": 3
                 }
@@ -691,6 +692,7 @@
       "id": 6,
       "type": "timeseries",
       "title": "Response time",
+      "description": "",
       "datasource": {
         "type": "prometheus",
         "uid": "${datasource}"
@@ -725,7 +727,9 @@
             "gradientMode": "opacity",
             "showPoints": "never",
             "lineInterpolation": "smooth",
-            "spanNulls": true
+            "spanNulls": true,
+            "axisBorderShow": false,
+            "axisSoftMin": 0
           },
           "min": 0
         },
@@ -887,6 +891,7 @@
       "id": 7,
       "type": "bargauge",
       "title": "Uptime by service, 30 days",
+      "description": "",
       "datasource": {
         "type": "prometheus",
         "uid": "${datasource}"
@@ -977,7 +982,8 @@
     {
       "id": 9,
       "type": "table",
-      "title": "hosts",
+      "title": "Hosts",
+      "description": "Current CPU, memory and root-disk use for each machine. Bars turn orange at 75% and red at 90%.",
       "datasource": {
         "type": "prometheus",
         "uid": "${datasource}"
@@ -1050,15 +1056,15 @@
           "options": {
             "renameByName": {
               "Value #A": "CPU",
-              "Value #B": "Mem",
+              "Value #B": "Memory",
               "Value #C": "Disk",
-              "host": "host"
+              "host": "Host"
             },
             "indexByName": {
               "host": 0,
-              "CPU": 1,
-              "Mem": 2,
-              "Disk": 3
+              "Value #A": 1,
+              "Value #B": 2,
+              "Value #C": 3
             }
           }
         }
@@ -1073,6 +1079,52 @@
           }
         },
         "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Host"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "value",
+                    "options": {
+                      "proxmox": {
+                        "text": "Proxmox",
+                        "index": 0
+                      },
+                      "pihole": {
+                        "text": "Pi-hole",
+                        "index": 1
+                      },
+                      "dockers": {
+                        "text": "Docker",
+                        "index": 2
+                      },
+                      "tailscale": {
+                        "text": "Tailscale",
+                        "index": 3
+                      },
+                      "plex": {
+                        "text": "Plex",
+                        "index": 4
+                      },
+                      "qbittorrent": {
+                        "text": "qBittorrent",
+                        "index": 5
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "custom.width",
+                "value": 130
+              }
+            ]
+          },
           {
             "matcher": {
               "id": "byName",
@@ -1134,7 +1186,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Mem"
+              "options": "Memory"
             },
             "properties": [
               {
@@ -1260,7 +1312,8 @@
     {
       "id": 10,
       "type": "timeseries",
-      "title": "CPU used",
+      "title": "CPU usage",
+      "description": "",
       "datasource": {
         "type": "prometheus",
         "uid": "${datasource}"
@@ -1295,7 +1348,9 @@
             "gradientMode": "opacity",
             "showPoints": "never",
             "lineInterpolation": "smooth",
-            "spanNulls": true
+            "spanNulls": true,
+            "axisBorderShow": false,
+            "axisSoftMin": 0
           },
           "min": 0,
           "max": 100
@@ -1313,6 +1368,10 @@
                   "mode": "fixed",
                   "fixedColor": "#fab387"
                 }
+              },
+              {
+                "id": "displayName",
+                "value": "Proxmox"
               }
             ]
           },
@@ -1328,6 +1387,10 @@
                   "mode": "fixed",
                   "fixedColor": "#f2cdcd"
                 }
+              },
+              {
+                "id": "displayName",
+                "value": "Pi-hole"
               }
             ]
           },
@@ -1343,6 +1406,10 @@
                   "mode": "fixed",
                   "fixedColor": "#89b4fa"
                 }
+              },
+              {
+                "id": "displayName",
+                "value": "Docker"
               }
             ]
           },
@@ -1358,6 +1425,10 @@
                   "mode": "fixed",
                   "fixedColor": "#f5c2e7"
                 }
+              },
+              {
+                "id": "displayName",
+                "value": "Tailscale"
               }
             ]
           },
@@ -1373,6 +1444,10 @@
                   "mode": "fixed",
                   "fixedColor": "#f9e2af"
                 }
+              },
+              {
+                "id": "displayName",
+                "value": "Plex"
               }
             ]
           },
@@ -1388,6 +1463,10 @@
                   "mode": "fixed",
                   "fixedColor": "#cba6f7"
                 }
+              },
+              {
+                "id": "displayName",
+                "value": "qBittorrent"
               }
             ]
           }
@@ -1412,7 +1491,8 @@
     {
       "id": 11,
       "type": "timeseries",
-      "title": "Memory used",
+      "title": "Memory usage",
+      "description": "",
       "datasource": {
         "type": "prometheus",
         "uid": "${datasource}"
@@ -1447,7 +1527,9 @@
             "gradientMode": "opacity",
             "showPoints": "never",
             "lineInterpolation": "smooth",
-            "spanNulls": true
+            "spanNulls": true,
+            "axisBorderShow": false,
+            "axisSoftMin": 0
           },
           "min": 0,
           "max": 100
@@ -1465,6 +1547,10 @@
                   "mode": "fixed",
                   "fixedColor": "#fab387"
                 }
+              },
+              {
+                "id": "displayName",
+                "value": "Proxmox"
               }
             ]
           },
@@ -1480,6 +1566,10 @@
                   "mode": "fixed",
                   "fixedColor": "#f2cdcd"
                 }
+              },
+              {
+                "id": "displayName",
+                "value": "Pi-hole"
               }
             ]
           },
@@ -1495,6 +1585,10 @@
                   "mode": "fixed",
                   "fixedColor": "#89b4fa"
                 }
+              },
+              {
+                "id": "displayName",
+                "value": "Docker"
               }
             ]
           },
@@ -1510,6 +1604,10 @@
                   "mode": "fixed",
                   "fixedColor": "#f5c2e7"
                 }
+              },
+              {
+                "id": "displayName",
+                "value": "Tailscale"
               }
             ]
           },
@@ -1525,6 +1623,10 @@
                   "mode": "fixed",
                   "fixedColor": "#f9e2af"
                 }
+              },
+              {
+                "id": "displayName",
+                "value": "Plex"
               }
             ]
           },
@@ -1540,6 +1642,10 @@
                   "mode": "fixed",
                   "fixedColor": "#cba6f7"
                 }
+              },
+              {
+                "id": "displayName",
+                "value": "qBittorrent"
               }
             ]
           }
@@ -1564,7 +1670,8 @@
     {
       "id": 12,
       "type": "timeseries",
-      "title": "Disk used (/)",
+      "title": "Disk usage",
+      "description": "",
       "datasource": {
         "type": "prometheus",
         "uid": "${datasource}"
@@ -1599,7 +1706,9 @@
             "gradientMode": "opacity",
             "showPoints": "never",
             "lineInterpolation": "smooth",
-            "spanNulls": true
+            "spanNulls": true,
+            "axisBorderShow": false,
+            "axisSoftMin": 0
           },
           "min": 0,
           "max": 100
@@ -1617,6 +1726,10 @@
                   "mode": "fixed",
                   "fixedColor": "#fab387"
                 }
+              },
+              {
+                "id": "displayName",
+                "value": "Proxmox"
               }
             ]
           },
@@ -1632,6 +1745,10 @@
                   "mode": "fixed",
                   "fixedColor": "#f2cdcd"
                 }
+              },
+              {
+                "id": "displayName",
+                "value": "Pi-hole"
               }
             ]
           },
@@ -1647,6 +1764,10 @@
                   "mode": "fixed",
                   "fixedColor": "#89b4fa"
                 }
+              },
+              {
+                "id": "displayName",
+                "value": "Docker"
               }
             ]
           },
@@ -1662,6 +1783,10 @@
                   "mode": "fixed",
                   "fixedColor": "#f5c2e7"
                 }
+              },
+              {
+                "id": "displayName",
+                "value": "Tailscale"
               }
             ]
           },
@@ -1677,6 +1802,10 @@
                   "mode": "fixed",
                   "fixedColor": "#f9e2af"
                 }
+              },
+              {
+                "id": "displayName",
+                "value": "Plex"
               }
             ]
           },
@@ -1692,6 +1821,10 @@
                   "mode": "fixed",
                   "fixedColor": "#cba6f7"
                 }
+              },
+              {
+                "id": "displayName",
+                "value": "qBittorrent"
               }
             ]
           }

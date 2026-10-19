@@ -675,7 +675,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "100 - (avg by (host) (rate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100)",
+          "expr": "100 * (1 - (sum by (host) (rate(node_cpu_seconds_total{mode=\"idle\"}[5m])) / sum by (host) (rate(node_cpu_seconds_total[5m]))))",
           "legendFormat": "{{host}}",
           "refId": "A"
         }

@@ -52,7 +52,7 @@
     {
       "id": 1,
       "type": "stat",
-      "title": "Services up",
+      "title": "Up",
       "description": "",
       "datasource": {
         "type": "prometheus",
@@ -117,7 +117,7 @@
     {
       "id": 2,
       "type": "stat",
-      "title": "Services down",
+      "title": "Down",
       "description": "Monitors whose last check failed",
       "datasource": {
         "type": "prometheus",
@@ -255,7 +255,7 @@
     {
       "id": 4,
       "type": "stat",
-      "title": "Uptime, 24 hours",
+      "title": "Uptime 24h",
       "description": "",
       "datasource": {
         "type": "prometheus",
@@ -308,7 +308,7 @@
       },
       "options": {
         "colorMode": "value",
-        "graphMode": "area",
+        "graphMode": "none",
         "justifyMode": "center",
         "orientation": "auto",
         "textMode": "value",
@@ -329,7 +329,7 @@
     {
       "id": 5,
       "type": "stat",
-      "title": "Uptime, 30 days",
+      "title": "Uptime 30d",
       "description": "",
       "datasource": {
         "type": "prometheus",
@@ -382,7 +382,7 @@
       },
       "options": {
         "colorMode": "value",
-        "graphMode": "area",
+        "graphMode": "none",
         "justifyMode": "center",
         "orientation": "auto",
         "textMode": "value",
@@ -403,7 +403,7 @@
     {
       "id": 6,
       "type": "stat",
-      "title": "DNS answer time",
+      "title": "DNS time",
       "description": "How long the Pi-hole takes to answer",
       "datasource": {
         "type": "prometheus",
@@ -835,6 +835,10 @@
         "namePlacement": "top",
         "minVizHeight": 16,
         "minVizWidth": 8,
+        "text": {
+          "titleSize": 13,
+          "valueSize": 16
+        },
         "reduceOptions": {
           "calcs": [
             "lastNotNull"

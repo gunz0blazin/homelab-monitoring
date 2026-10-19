@@ -86,6 +86,7 @@ class Dash:
                                          "color": {"mode": "thresholds"}, "thresholds": thresholds}, "overrides": []},
             "options": {"orientation": "horizontal", "displayMode": "basic", "showUnfilled": True,
                         "valueMode": "color", "namePlacement": "top", "minVizHeight": 16, "minVizWidth": 8,
+                        "text": {"titleSize": 13, "valueSize": 16},
                         "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": False}}})
 
     def timeseries(self, title, expr, legend, g, unit, vmin=None, vmax=None, overrides=None, table_legend=True):

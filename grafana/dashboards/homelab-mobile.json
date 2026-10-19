@@ -581,6 +581,10 @@
         "namePlacement": "top",
         "minVizHeight": 16,
         "minVizWidth": 8,
+        "text": {
+          "titleSize": 13,
+          "valueSize": 16
+        },
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -654,6 +658,10 @@
         "namePlacement": "top",
         "minVizHeight": 16,
         "minVizWidth": 8,
+        "text": {
+          "titleSize": 13,
+          "valueSize": 16
+        },
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -727,6 +735,10 @@
         "namePlacement": "top",
         "minVizHeight": 16,
         "minVizWidth": 8,
+        "text": {
+          "titleSize": 13,
+          "valueSize": 16
+        },
         "reduceOptions": {
           "calcs": [
             "lastNotNull"

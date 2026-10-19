@@ -17,7 +17,7 @@
 .hlw *, .hlw *::before, .hlw *::after { box-sizing: border-box; }
 .hl {
   height: 100%; overflow-y: auto; scrollbar-width: none;
-  background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 20px 22px;
+  background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 22px 0;
   transition: background-color 300ms var(--ease), border-color 300ms var(--ease);
 }
 .hl::-webkit-scrollbar { display: none; }
@@ -29,8 +29,8 @@
 .info { --tone: var(--info); }
 
 /* ---------- status header ---------- */
-.head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 20px 40px; padding: 24px 28px; }
-.head .lead { display: flex; align-items: center; gap: 18px; min-width: 0; }
+.head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 20px 40px; padding: 28px 0; }
+.head .lead { display: flex; align-items: center; gap: 18px; min-width: 0; margin-left: 30px; }
 .head .dot {
   flex: none; width: 14px; height: 14px; border-radius: 50%; background: var(--tone); color: var(--tone);
   box-shadow: 0 0 0 6px color-mix(in srgb, var(--tone) 16%, transparent);
@@ -42,16 +42,16 @@
 }
 .head .h { font-size: 22px; font-weight: 600; line-height: 1.2; letter-spacing: -0.022em; }
 .head .s { margin-top: 4px; font-size: 14px; color: var(--sub); line-height: 1.35; }
-.head .stats { display: flex; flex-wrap: wrap; gap: 14px 44px; }
+.head .stats { display: flex; flex-wrap: wrap; gap: 14px 44px; margin-right: 30px; }
 .head .num { font-size: 44px; font-weight: 600; line-height: 1; letter-spacing: -0.035em; }
 .head .of { font-size: 14px; font-weight: 400; color: var(--dim); letter-spacing: 0; }
 .head .cap { margin-top: 8px; font-size: 12px; color: var(--dim); letter-spacing: 0.01em; }
 
 /* ---------- list cards ---------- */
-.hd { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 8px; }
+.hd { display: flex; align-items: baseline; justify-content: space-between; margin: 0 26px 8px; }
 .hd .ti { font-size: 14px; font-weight: 600; letter-spacing: -0.01em; }
 .hd .su, .skel .su { font-size: 12px; color: var(--dim); }
-.row { display: grid; align-items: center; border-top: 1px solid var(--line); }
+.row { display: grid; align-items: center; border-top: 1px solid var(--line); margin: 0 26px; }
 .row:first-of-type { border-top: 0; }
 .tag { margin-left: 8px; font-size: 12px; font-weight: 500; color: var(--tone); }
 .row.gone .nm { color: var(--dim); }
@@ -82,11 +82,14 @@
 
 /* narrow cards (phones): same layout, tighter */
 @container (max-width: 560px) {
-  .hl { padding: 18px 18px; border-radius: 18px; }
-  .head { padding: 20px 20px; gap: 22px; }
+  .hl { padding: 20px 0; border-radius: 18px; }
+  .hd { margin: 0 22px 8px; }
+  .row { margin: 0 22px; }
+  .head { padding: 24px 0; gap: 22px; }
+  .head .lead { margin-left: 22px; }
   .head .h { font-size: 20px; }
   .head .num { font-size: 34px; }
-  .head .stats { gap: 14px 28px; width: 100%; justify-content: space-between; }
+  .head .stats { gap: 14px 28px; width: calc(100% - 44px); margin: 0 22px; justify-content: space-between; }
   .hosts .row { grid-template-columns: minmax(70px, 1fr) repeat(3, minmax(0, 0.9fr)); gap: 0 12px; }
   .hosts .lab b { display: none; }
   .svcs .row { grid-template-columns: 8px minmax(0, 1fr) auto 62px; gap: 0 10px; }

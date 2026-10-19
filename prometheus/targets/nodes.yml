@@ -1,0 +1,4 @@
+# One entry per machine running prometheus-node-exporter (port 9100).
+# Prometheus picks up changes to this file within a minute.
+- targets: ["192.168.20.14:9100"]
+  labels: {host: tailscale}

@@ -106,7 +106,7 @@ def build(kind, uid, title, path, description):
     ):
         D.add(chart)
 
-    D.finish(path, uid, title, description, ["homelab", "testing"], nav_links(uid), refresh="5s", hide_ds=True)
+    D.finish(path, uid, title, description, ["homelab", "testing"], nav_links(uid), hide_ds=True)
 
 
 build("mobile", "homelab", "Homelab Testing Mobile", "grafana/dashboards/homelab.json",

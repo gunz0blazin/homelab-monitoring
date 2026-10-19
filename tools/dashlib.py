@@ -14,6 +14,9 @@ HEALTHY, BAD, WARN, PENDING, INFO, MUTED = C["teal"], C["red"], C["peach"], C["y
 
 DS = {"type": "prometheus", "uid": "${datasource}"}
 
+# Every dashboard refreshes this often (the owner wants all of them at 5 s, including new ones).
+REFRESH = "5s"
+
 # Graph line colours, matched by regex on the series name (Kuma keeps trailing spaces in monitor
 # names, hence the \s*). Anything not listed falls back to Grafana's classic palette.
 HOST_COLORS = {"proxmox": C["peach"], "pihole": C["red"], "dockers": C["blue"],
@@ -279,7 +282,7 @@ class Dash:
             "2": {"text": "Pending", "color": PENDING, "index": 2},
             "3": {"text": "Maintenance", "color": self.maint, "index": 3}}}]
 
-    def finish(self, path, uid, title, description, tags, link, refresh="10s", hide_ds=False):
+    def finish(self, path, uid, title, description, tags, link, refresh=REFRESH, hide_ds=False):
         dashboard = {
             "uid": uid, "title": title, "tags": tags, "timezone": "browser", "schemaVersion": 39, "version": 1,
             "editable": True, "graphTooltip": 1, "refresh": refresh, "time": {"from": "now-6h", "to": "now"},

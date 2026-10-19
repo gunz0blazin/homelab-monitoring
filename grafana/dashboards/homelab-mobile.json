@@ -88,7 +88,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "#94e2d5",
+                "color": "#cba6f7",
                 "value": null
               }
             ]
@@ -101,7 +101,7 @@
                 "to": 0.5,
                 "result": {
                   "text": "ALL SYSTEMS UP",
-                  "color": "#94e2d5",
+                  "color": "#cba6f7",
                   "index": 0
                 }
               }
@@ -212,7 +212,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "#94e2d5",
+                "color": "#89b4fa",
                 "value": null
               }
             ]
@@ -231,7 +231,7 @@
                   "mode": "absolute",
                   "steps": [
                     {
-                      "color": "#94e2d5",
+                      "color": "#74c7ec",
                       "value": null
                     }
                   ]
@@ -399,7 +399,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "#94e2d5",
+                "color": "#89b4fa",
                 "value": null
               }
             ]
@@ -426,7 +426,7 @@
                       "value": 95
                     },
                     {
-                      "color": "#94e2d5",
+                      "color": "#74c7ec",
                       "value": 99
                     }
                   ]
@@ -468,7 +468,7 @@
                       "value": 95
                     },
                     {
-                      "color": "#94e2d5",
+                      "color": "#74c7ec",
                       "value": 99
                     }
                   ]
@@ -552,7 +552,7 @@
                 "value": null
               },
               {
-                "color": "#94e2d5",
+                "color": "#74c7ec",
                 "value": 1
               },
               {
@@ -560,7 +560,7 @@
                 "value": 2
               },
               {
-                "color": "#89b4fa",
+                "color": "#b4befe",
                 "value": 3
               }
             ]
@@ -576,7 +576,7 @@
                 },
                 "1": {
                   "text": "UP",
-                  "color": "#94e2d5",
+                  "color": "#74c7ec",
                   "index": 1
                 },
                 "2": {
@@ -586,7 +586,7 @@
                 },
                 "3": {
                   "text": "MAINT",
-                  "color": "#89b4fa",
+                  "color": "#b4befe",
                   "index": 3
                 }
               }
@@ -953,7 +953,7 @@
                 "id": "color",
                 "value": {
                   "mode": "fixed",
-                  "fixedColor": "#94e2d5"
+                  "fixedColor": "#f5c2e7"
                 }
               }
             ]
@@ -1013,7 +1013,7 @@
                 "id": "color",
                 "value": {
                   "mode": "fixed",
-                  "fixedColor": "#f38ba8"
+                  "fixedColor": "#f2cdcd"
                 }
               }
             ]
@@ -1043,7 +1043,7 @@
                 "id": "color",
                 "value": {
                   "mode": "fixed",
-                  "fixedColor": "#eba0ac"
+                  "fixedColor": "#cba6f7"
                 }
               }
             ]
@@ -1073,7 +1073,7 @@
                 "id": "color",
                 "value": {
                   "mode": "fixed",
-                  "fixedColor": "#a6e3a1"
+                  "fixedColor": "#f5e0dc"
                 }
               }
             ]
@@ -1155,7 +1155,7 @@
                 "id": "color",
                 "value": {
                   "mode": "fixed",
-                  "fixedColor": "#94e2d5"
+                  "fixedColor": "#f5c2e7"
                 }
               }
             ]
@@ -1215,7 +1215,7 @@
                 "id": "color",
                 "value": {
                   "mode": "fixed",
-                  "fixedColor": "#f38ba8"
+                  "fixedColor": "#f2cdcd"
                 }
               }
             ]
@@ -1245,7 +1245,7 @@
                 "id": "color",
                 "value": {
                   "mode": "fixed",
-                  "fixedColor": "#eba0ac"
+                  "fixedColor": "#cba6f7"
                 }
               }
             ]
@@ -1275,7 +1275,7 @@
                 "id": "color",
                 "value": {
                   "mode": "fixed",
-                  "fixedColor": "#a6e3a1"
+                  "fixedColor": "#f5e0dc"
                 }
               }
             ]

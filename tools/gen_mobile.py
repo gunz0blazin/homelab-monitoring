@@ -10,24 +10,30 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from dashlib import *  # noqa: E402,F401,F403
 
-D = Dash()
+# No greens on this board: "up" is sapphire, the banner is mauve, and red/peach/yellow still mean trouble.
+UP = C["sapphire"]
+D = Dash(healthy=UP, maint=C["lavender"])
 quiet = lambda hit: steps((MUTED, None), (hit, 1))
+UPTIME_M = steps((BAD, None), (PENDING, 95), (UP, 99))
+MONITOR_COLORS_M = {"420NAS": C["pink"], "Grafana": C["peach"], "Home Assistant": C["sky"], "NPM": C["lavender"],
+                    "PiHole Primary": C["flamingo"], "Plex": C["yellow"], "Proxmox": C["mauve"],
+                    "qBittorent": C["blue"], "Uptime Kuma": C["rosewater"]}
 
 # 1. banner: one phrase for the whole lab
 D.hero("", '(count(monitor_status == 0) or vector(0)) * 10 + (count(monitor_status == 2 or monitor_status == 3) or vector(0))',
-       pos(0, 0, 24, 4))
+       pos(0, 0, 24, 4), up=C["mauve"])
 
 # 2. the three counts, side by side
 D.multi_stat("services", [
-    ("Up", 'count(monitor_status == 1) or vector(0)', steps((HEALTHY, None)), "none", 0),
+    ("Up", 'count(monitor_status == 1) or vector(0)', steps((UP, None)), "none", 0),
     ("Down", 'count(monitor_status == 0) or vector(0)', quiet(BAD), "none", 0),
     ("Pending", 'count(monitor_status == 2 or monitor_status == 3) or vector(0)', quiet(PENDING), "none", 0),
 ], pos(0, 4, 24, 5), size=44)
 
 # 3. uptime, side by side
 D.multi_stat("uptime", [
-    ("24 hours", 'avg(monitor_uptime_ratio{window="1d"}) * 100', UPTIME, "percent", 2),
-    ("30 days", 'avg(monitor_uptime_ratio{window="30d"}) * 100', UPTIME, "percent", 2),
+    ("24 hours", 'avg(monitor_uptime_ratio{window="1d"}) * 100', UPTIME_M, "percent", 2),
+    ("30 days", 'avg(monitor_uptime_ratio{window="30d"}) * 100', UPTIME_M, "percent", 2),
 ], pos(0, 9, 24, 4), size=30)
 
 # 4. one row per service, one cell per ~10 minutes of the last 6 hours
@@ -42,11 +48,11 @@ D.host_table("hosts", [
 
 # 6. latest response time per service, each bar in its own Mocha colour
 D.bars("latency now", "monitor_response_time", pos(0, 35, 24, 10), steps((INFO, None)), unit="ms", vmin=0, vmax=None,
-       legend="{{monitor_name}}", display="gradient", overrides=color_overrides(MONITOR_COLORS), transparent=True)
+       legend="{{monitor_name}}", display="gradient", overrides=color_overrides(MONITOR_COLORS_M), transparent=True)
 
 # 7. response time over the last 6 hours
 D.timeseries("response time", "monitor_response_time", "{{monitor_name}}", pos(0, 45, 24, 8), "ms", vmin=0,
-             overrides=color_overrides(MONITOR_COLORS), table_legend=False)
+             overrides=color_overrides(MONITOR_COLORS_M), table_legend=False)
 
 D.finish("grafana/dashboards/homelab-mobile.json", "homelab-mobile", "Homelab Mobile",
          "Phone-sized view of Homelab Overview: one status banner, a 6-hour status grid, and host gauges. Source: the homelab-monitoring repo.",

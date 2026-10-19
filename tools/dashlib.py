@@ -44,9 +44,11 @@ def pos(x, y, w, h):
 
 
 class Dash:
-    def __init__(self):
+    def __init__(self, healthy=None, maint=None):
         self._id = 0
         self.panels = []
+        self.healthy = healthy or HEALTHY   # colour for "up" in status mappings and the status grid
+        self.maint = maint or INFO          # colour for "maintenance"
 
     def nid(self):
         self._id += 1
@@ -113,17 +115,19 @@ class Dash:
             "fieldConfig": {"defaults": d, "overrides": overrides or []},
             "options": {"legend": legend_opts, "tooltip": {"mode": "multi", "sort": "desc"}}})
 
-    def hero(self, title, expr, g):
+    def hero(self, title, expr, g, up=None):
         """Full-width status banner: one phrase on a soft gradient fill. The only filled block on the board.
         expr must be down * 10 + pending, so 0 = all up, 1-9 = something retrying, 10+ = something down."""
+        up = up or self.healthy
+
         def rng(lo, hi, text, color, i):
             return {"type": "range", "options": {"from": lo, "to": hi, "result": {"text": text, "color": color, "index": i}}}
         return self.add({
             "id": self.nid(), "type": "stat", "title": title, "datasource": DS, "gridPos": g, "transparent": True,
             "targets": [self.target(expr, "", instant=True)],
             "fieldConfig": {"defaults": {"unit": "none", "color": {"mode": "thresholds"},
-                                         "thresholds": steps((HEALTHY, None)),
-                                         "mappings": [rng(0, 0.5, "ALL SYSTEMS UP", HEALTHY, 0),
+                                         "thresholds": steps((up, None)),
+                                         "mappings": [rng(0, 0.5, "ALL SYSTEMS UP", up, 0),
                                                       rng(0.5, 9.5, "DEGRADED", PENDING, 1),
                                                       rng(9.5, 1000000, "OUTAGE", BAD, 2)]}, "overrides": []},
             "options": {"colorMode": "background", "graphMode": "none", "justifyMode": "center",
@@ -147,7 +151,7 @@ class Dash:
         return self.add({
             "id": self.nid(), "type": "stat", "title": title, "datasource": DS, "gridPos": g, "transparent": True,
             "targets": targets,
-            "fieldConfig": {"defaults": {"color": {"mode": "thresholds"}, "thresholds": steps((HEALTHY, None))},
+            "fieldConfig": {"defaults": {"color": {"mode": "thresholds"}, "thresholds": steps((INFO, None))},
                             "overrides": overrides},
             "options": {"colorMode": "value", "graphMode": "none", "justifyMode": "center",
                         "orientation": "horizontal", "textMode": "value_and_name", "wideLayout": True,
@@ -159,7 +163,8 @@ class Dash:
         return self.add({
             "id": self.nid(), "type": "status-history", "title": title, "datasource": DS, "gridPos": g,
             "transparent": True, "maxDataPoints": points, "targets": [self.target(expr, legend)],
-            "fieldConfig": {"defaults": {"color": {"mode": "thresholds"}, "thresholds": STATUS,
+            "fieldConfig": {"defaults": {"color": {"mode": "thresholds"},
+                                         "thresholds": steps((BAD, None), (self.healthy, 1), (PENDING, 2), (self.maint, 3)),
                                          "mappings": self.status_mappings(),
                                          "custom": {"fillOpacity": 80, "lineWidth": 0}}, "overrides": []},
             "options": {"showValue": "never", "rowHeight": 0.85, "colWidth": 0.92,
@@ -197,9 +202,9 @@ class Dash:
     def status_mappings(self):
         return [{"type": "value", "options": {
             "0": {"text": "DOWN", "color": BAD, "index": 0},
-            "1": {"text": "UP", "color": HEALTHY, "index": 1},
+            "1": {"text": "UP", "color": self.healthy, "index": 1},
             "2": {"text": "PENDING", "color": PENDING, "index": 2},
-            "3": {"text": "MAINT", "color": INFO, "index": 3}}}]
+            "3": {"text": "MAINT", "color": self.maint, "index": 3}}}]
 
     def finish(self, path, uid, title, description, tags, link, refresh="10s", hide_ds=False):
         dashboard = {

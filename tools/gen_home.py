@@ -74,7 +74,7 @@ card(D, pos(14, 6, 10, 11), "services.js", "services", [
     q("C", 'monitor_uptime_ratio{window="30d"} * 100', "svcup"),
 ], "Services")
 
-# --- 4. trends: collapsed by default, quiet native charts
+# --- 4. trends: open by default, quiet native charts
 rate_cpu = CPU.replace("[5m]", "[$__rate_interval]")
 hosts = color_overrides(HOST_COLORS_COOL, HOST_NAMES)
 ms_colors = [{"matcher": {"id": "byName", "options": "Average"}, "properties": [{"id": "color", "value": {"mode": "fixed", "fixedColor": C["blue"]}}]},
@@ -86,7 +86,11 @@ charts = [
     D.calm_timeseries("Memory", [(MEM, "{{host}}")], pos(0, 26, 12, 8), "percent", 0, 100, hosts),
     D.calm_timeseries("Disk", [(DSK, "{{host}}")], pos(12, 26, 12, 8), "percent", 0, 100, hosts),
 ]
-D.add({"id": D.nid(), "type": "row", "title": "Trends", "collapsed": True, "gridPos": pos(0, 17, 24, 1), "panels": charts})
+# Open by default: an expanded row has an empty `panels` list and its charts follow it at the top level.
+# To collapse it again, set "collapsed" to True and move `charts` into the row's `panels`.
+D.add({"id": D.nid(), "type": "row", "title": "Trends", "collapsed": False, "gridPos": pos(0, 17, 24, 1), "panels": []})
+for chart in charts:
+    D.add(chart)
 
 D.finish("grafana/dashboards/homelab.json", "homelab", "Homelab",
          "Status, hosts and services for the home lab. Source: the homelab-monitoring repo.",

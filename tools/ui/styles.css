@@ -32,7 +32,7 @@
 .info { --tone: var(--info); }
 
 /* ---------- status header ---------- */
-.head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 20px 40px; padding: 28px 0; }
+.head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 20px 40px; padding: 6px 0; }
 .head .lead { display: flex; align-items: center; gap: 18px; min-width: 0; margin-left: 30px; }
 .head .dot {
   flex: none; width: 14px; height: 14px; border-radius: 50%; background: var(--tone); color: var(--tone);
@@ -88,7 +88,7 @@
   .hl { padding: 20px 0; border-radius: 18px; }
   .hd { margin: 0 22px 8px; }
   .row { margin: 0 22px; }
-  .head { padding: 24px 0; gap: 22px; }
+  .head { padding: 4px 0; gap: 22px; }
   .head .lead { margin-left: 22px; }
   .head .h { font-size: 20px; }
   .head .num { font-size: 34px; }

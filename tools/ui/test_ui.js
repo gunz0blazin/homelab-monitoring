@@ -107,6 +107,12 @@ test("header: a pending service does not also say its host is offline", () => {
   assert.strictEqual(html(out).querySelector(".k_hst").textContent, "5", "the host count still shows 5 of 6");
 });
 
+test("header: a service in maintenance is described as in maintenance, not pending", () => {
+  const out = load("header")(headerData({ pend: 1, up: 8, svc: (n) => (n === "NPM" ? 3 : 1) }));
+  assert(out.includes("NPM in maintenance"), out);
+  assert(!out.includes("NPM pending"), out);
+});
+
 test("header: no data at all is never reported as all clear", () => {
   const out = load("header")([]);
   assert(!out.includes("All systems operational"), out);

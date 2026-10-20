@@ -8,12 +8,12 @@ function renderHeader(data) {
   const kuma = first(R, "kup", NaN);
 
   const bad = only(R, "svc").filter((r) => num(r) !== 1 && Number.isFinite(num(r)));
-  const downNames = bad.filter((r) => num(r) === 0).map((r) => String(r.monitor_name).trim());
-  const waitNames = bad.filter((r) => num(r) !== 0).map((r) => String(r.monitor_name).trim());
+  const named = (status) => bad.filter((r) => num(r) === status).map((r) => String(r.monitor_name).trim());
+  const downNames = named(0), waitNames = named(2), maintNames = named(3);
   const hosts = only(R, "hup");
   // a host that is offline because its own service is down or pending is the same story: say it once, as the service
   const norm = (s) => String(s).toLowerCase().replace(/[^a-z0-9]/g, "");
-  const flagged = downNames.concat(waitNames).map(norm);
+  const flagged = downNames.concat(waitNames, maintNames).map(norm);
   const covered = (name) => flagged.some((f) => f.startsWith(norm(name)) || norm(name).startsWith(f));
   const offline = hosts.filter((r) => num(r) === 0).map((r) => hostName(r.host)).filter((n) => !covered(n));
   const hostsOn = hosts.filter((r) => num(r) !== 0).length;
@@ -27,11 +27,12 @@ function renderHeader(data) {
   } else if (total === 0) {
     state = "warn"; head = "No services monitored yet"; blind = "Add monitors in Uptime Kuma";
   } else if (downNames.length || down > 0) { state = "crit"; head = "Service outage"; }
-  else if (waitNames.length || pend > 0 || offline.length) { state = "warn"; head = "Degraded performance"; }
+  else if (waitNames.length || maintNames.length || pend > 0 || offline.length) { state = "warn"; head = "Degraded performance"; }
 
   const notes = [];
   if (downNames.length) notes.push(list(downNames) + " down");
   if (waitNames.length) notes.push(list(waitNames) + " pending");
+  if (maintNames.length) notes.push(list(maintNames) + " in maintenance");
   if (offline.length) notes.push(list(offline) + " offline");
   const sub = blind || (notes.length ? notes.join(" · ") : total + " services and " + hosts.length + " hosts are healthy");
 

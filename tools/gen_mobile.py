@@ -15,7 +15,7 @@ D = Dash(healthy=UP, maint=C["lavender"])   # UP, UPTIME_M, MONITOR_COLORS_M com
 quiet = lambda hit: steps((MUTED, None), (hit, 1))
 
 # 1. banner: one phrase for the whole lab
-D.hero("", '(count(monitor_status == 0) or vector(0)) * 10 + (count(monitor_status == 2 or monitor_status == 3) or vector(0))',
+D.hero("", HERO_EXPR,
        pos(0, 0, 24, 4), up=C["mauve"])
 
 # 2. the three counts, side by side

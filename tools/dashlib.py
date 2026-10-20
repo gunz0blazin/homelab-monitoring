@@ -86,6 +86,14 @@ def nav_links(current_uid):
     return [(title, url) for uid, title, url in NAV if uid != current_uid]
 
 
+# Banner value for hero(): down * 10 + pending, plus 1000 when Prometheus isn't scraping Uptime Kuma or no
+# monitor series exist at all. Without the 1000s, "Kuma is gone" counted as zero problems and read all clear.
+HERO_EXPR = ('(count(monitor_status == 0) or vector(0)) * 10'
+             ' + (count(monitor_status == 2 or monitor_status == 3) or vector(0))'
+             ' + (1 - clamp_max(count(monitor_status) or vector(0), 1)) * 1000'
+             ' + (1 - (max(up{job="uptime-kuma"}) or vector(0))) * 1000')
+
+
 def pos(x, y, w, h):
     return {"x": x, "y": y, "w": w, "h": h}
 
@@ -187,7 +195,8 @@ class Dash:
 
     def hero(self, title, expr, g, up=None):
         """Full-width status banner: one phrase on a soft gradient fill. The only filled block on the board.
-        expr must be down * 10 + pending, so 0 = all up, 1-9 = something retrying, 10+ = something down."""
+        expr is HERO_EXPR: 0 = all up, 1-9 = something retrying, 10-998 = something down, 999+ = Uptime Kuma
+        isn't reporting (so nothing can be said about the services)."""
         up = up or self.healthy
 
         def rng(lo, hi, text, color, i):
@@ -199,7 +208,8 @@ class Dash:
                                          "thresholds": steps((up, None)),
                                          "mappings": [rng(0, 0.5, "All systems operational", up, 0),
                                                       rng(0.5, 9.5, "Degraded performance", PENDING, 1),
-                                                      rng(9.5, 1000000, "Service outage", BAD, 2)]}, "overrides": []},
+                                                      rng(9.5, 999, "Service outage", BAD, 2),
+                                                      rng(999, 1000000000, "Monitoring unavailable", BAD, 3)]}, "overrides": []},
             "options": {"colorMode": "background", "graphMode": "none", "justifyMode": "center",
                         "orientation": "auto", "textMode": "value", "wideLayout": True,
                         "text": {"valueSize": 26},

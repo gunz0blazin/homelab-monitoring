@@ -11,7 +11,7 @@ D = Dash(healthy=UP, maint=C["lavender"])
 quiet = lambda hit: steps((MUTED, None), (hit, 1))    # zero is calm grey, one or more takes the warning colour
 
 # --- top strip: banner, counts, uptime, DNS (side by side; this is the wide layout)
-D.hero("", '(count(monitor_status == 0) or vector(0)) * 10 + (count(monitor_status == 2 or monitor_status == 3) or vector(0))',
+D.hero("", HERO_EXPR,
        pos(0, 0, 8, 5), up=C["mauve"])
 D.multi_stat("Services", [
     ("Up", 'count(monitor_status == 1) or vector(0)', steps((UP, None)), "none", 0),

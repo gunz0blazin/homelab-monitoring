@@ -41,8 +41,10 @@ function renderHeader(data) {
     (of === "" ? "" : '<span class="of"> ' + of + "</span>") + '</div><div class="cap">' + cap + "</div></div>";
 
   // second row: the smaller numbers. Zero down/pending stays grey; DNS and uptime take a tone when they slip.
-  const mini = (key, value, cap, t) =>
-    '<div class="mstat"><div class="mnum ' + (t || "") + '"><span class="cnt k_' + key + '">' + value + '</span></div><div class="cap">' + cap + "</div></div>";
+  // a long caption for wide cards and a short one for phones, so the five items never outgrow the row
+  const mini = (key, value, cap, t, short) =>
+    '<div class="mstat"><div class="mnum ' + (t || "") + '"><span class="cnt k_' + key + '">' + value + '</span></div><div class="cap"><span class="full">' + cap +
+    '</span><span class="short">' + (short || cap) + "</span></div></div>";
   // The Down Tester is a test device that is meant to be down, so it is never part of the counts above and never
   // changes the headline. It only gets a word of its own here: Down (pink), Up, or Off when it isn't reporting.
   const tv = first(R, "tester", NaN);
@@ -60,8 +62,8 @@ function renderHeader(data) {
     '</div><div class="stats2">' +
     mini("down", down, "Down", down > 0 ? "crit" : "zero") +
     mini("pend", pend, "Pending", pend > 0 ? "warn" : "zero") +
-    mini("up1d", pct(uptime1d), "Uptime, 24 hours", upTone(uptime1d)) +
-    mini("dns", Number.isFinite(dns) ? Math.round(dns) + " ms" : "n/a", "DNS response", dnsTone) +
+    mini("up1d", pct(uptime1d), "Uptime, 24 hours", upTone(uptime1d), "24 h") +
+    mini("dns", Number.isFinite(dns) ? Math.round(dns) + " ms" : "n/a", "DNS response", dnsTone, "DNS") +
     '<div class="mstat tester"><div class="mnum ' + tester[1] + '">' + tester[0] + '</div><div class="cap">Tester</div></div>' +
     "</div>");
 }

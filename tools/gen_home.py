@@ -60,15 +60,15 @@ HOSTS = color_overrides(HOST_COLORS_COOL, HOST_NAMES)
 LAYOUTS = {
     # phone first: full-width header, hosts and services side by side on a wide screen, then the main
     # dashboard's graphs (status grid, uptime and latency bars), then the trend charts
-    "mobile": {"header": pos(0, 0, 24, 7), "hosts": pos(0, 7, 14, 12), "services": pos(14, 7, 10, 12),
-               "grid": pos(0, 19, 24, 11), "pts": 40, "uptime": pos(0, 30, 12, 15), "latency": pos(12, 30, 12, 15),
-               "row": pos(0, 45, 24, 1),
-               "charts": [pos(0, 46, 24, 9), pos(0, 55, 12, 8), pos(12, 55, 12, 8), pos(0, 63, 24, 8)]},
+    "mobile": {"header": pos(0, 0, 24, 8), "hosts": pos(0, 8, 14, 12), "services": pos(14, 8, 10, 12),
+               "grid": pos(0, 20, 24, 11), "pts": 40, "uptime": pos(0, 31, 12, 15), "latency": pos(12, 31, 12, 15),
+               "row": pos(0, 46, 24, 1),
+               "charts": [pos(0, 47, 24, 9), pos(0, 56, 12, 8), pos(12, 56, 12, 8), pos(0, 64, 24, 8)]},
     # wide screens: hosts and services half and half, then everything from the main dashboard
-    "desktop": {"header": pos(0, 0, 24, 6), "hosts": pos(0, 6, 12, 12), "services": pos(12, 6, 12, 12),
-                "grid": pos(0, 18, 24, 9), "pts": 60, "uptime": pos(0, 27, 12, 11), "latency": pos(12, 27, 12, 11),
-                "row": pos(0, 38, 24, 1),
-                "charts": [pos(0, 39, 24, 10), pos(0, 49, 8, 9), pos(8, 49, 8, 9), pos(16, 49, 8, 9)]},
+    "desktop": {"header": pos(0, 0, 24, 7), "hosts": pos(0, 7, 12, 12), "services": pos(12, 7, 12, 12),
+                "grid": pos(0, 19, 24, 9), "pts": 60, "uptime": pos(0, 28, 12, 11), "latency": pos(12, 28, 12, 11),
+                "row": pos(0, 39, 24, 1),
+                "charts": [pos(0, 40, 24, 10), pos(0, 50, 8, 9), pos(8, 50, 8, 9), pos(16, 50, 8, 9)]},
 }
 
 

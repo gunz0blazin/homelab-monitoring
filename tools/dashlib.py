@@ -1,7 +1,8 @@
-"""Shared pieces for the dashboard generators (gen_overview.py, gen_mobile.py).
+"""Shared pieces for the dashboard generators (gen_overview.py, gen_mobile.py, gen_home.py).
 
-Colour rule: healthy is a calm teal; red, peach and yellow appear only for real problems; blue,
-mauve and lavender are the neutral accents. Palette: Catppuccin Mocha (https://catppuccin.com/palette).
+Colour rule: there is no green or teal on any dashboard. "Up" is sapphire (UP), maintenance is lavender, red,
+peach and yellow appear only for real problems, and blue, mauve and lavender are the neutral accents.
+Palette: Catppuccin Mocha (https://catppuccin.com/palette).
 """
 import json
 import re
@@ -10,7 +11,8 @@ C = {"rosewater": "#f5e0dc", "flamingo": "#f2cdcd", "pink": "#f5c2e7", "mauve": 
      "maroon": "#eba0ac", "peach": "#fab387", "yellow": "#f9e2af", "green": "#a6e3a1", "teal": "#94e2d5",
      "sky": "#89dceb", "sapphire": "#74c7ec", "blue": "#89b4fa", "lavender": "#b4befe", "text": "#cdd6f4",
      "overlay0": "#6c7086", "surface1": "#45475a", "surface0": "#313244", "base": "#1e1e2e"}
-HEALTHY, BAD, WARN, PENDING, INFO, MUTED = C["teal"], C["red"], C["peach"], C["yellow"], C["blue"], C["overlay0"]
+UP = C["sapphire"]
+HEALTHY, BAD, WARN, PENDING, INFO, MUTED = UP, C["red"], C["peach"], C["yellow"], C["blue"], C["overlay0"]
 
 DS = {"type": "prometheus", "uid": "${datasource}"}
 
@@ -18,16 +20,8 @@ DS = {"type": "prometheus", "uid": "${datasource}"}
 REFRESH = "5s"
 
 # Graph line colours, matched by regex on the series name (Kuma keeps trailing spaces in monitor
-# names, hence the \s*). Anything not listed falls back to Grafana's classic palette.
-HOST_COLORS = {"proxmox": C["peach"], "pihole": C["red"], "dockers": C["blue"],
-               "tailscale": C["teal"], "plex": C["yellow"], "qbittorrent": C["mauve"]}
-MONITOR_COLORS = {"420NAS": C["teal"], "Grafana": C["peach"], "Home Assistant": C["sky"], "NPM": C["lavender"],
-                  "PiHole Primary": C["red"], "Plex": C["yellow"], "Proxmox": C["maroon"], "qBittorent": C["blue"],
-                  "Uptime Kuma": C["green"]}
-
-
-# Green-free versions used by both dashboards: "up" is sapphire, line colours avoid teal and green.
-UP = C["sapphire"]
+# names, hence the \s*). Anything not listed falls back to Grafana's classic palette. Add new hosts and
+# monitors here. "Up" is sapphire; line colours avoid teal and green.
 HOST_COLORS_M = {"proxmox": C["peach"], "pihole": C["flamingo"], "dockers": C["blue"],
                  "tailscale": C["pink"], "plex": C["yellow"], "qbittorrent": C["mauve"]}
 MONITOR_COLORS_M = {"420NAS": C["pink"], "Grafana": C["peach"], "Home Assistant": C["sky"], "NPM": C["lavender"],
@@ -67,11 +61,8 @@ def steps(*pairs):
     return {"mode": "absolute", "steps": [{"color": c, "value": v} for c, v in pairs]}
 
 
-# healthy-until-it-isn't thresholds
-PCT_USED = steps((INFO, None), (WARN, 75), (BAD, 90))                  # CPU, memory, disk
-UPTIME = steps((BAD, None), (PENDING, 95), (HEALTHY, 99))              # uptime %: teal from 99, yellow from 95, red below
-STATUS = steps((BAD, None), (HEALTHY, 1), (PENDING, 2), (INFO, 3))     # monitor_status: 0 down 1 up 2 pending 3 maint
-UPTIME_M = steps((BAD, None), (PENDING, 95), (UP, 99))                 # same, with sapphire instead of teal
+# Uptime %: red below 95, yellow from 95, sapphire from 99
+UPTIME_M = steps((BAD, None), (PENDING, 95), (UP, 99))
 
 
 # Every dashboard shows a button for each of the others, so you can flip between them from anywhere.

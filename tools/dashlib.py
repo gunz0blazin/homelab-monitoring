@@ -23,6 +23,16 @@ MONITOR_COLORS = {"420NAS": C["teal"], "Grafana": C["peach"], "Home Assistant": 
                   "Uptime Kuma": C["green"]}
 
 
+# The "down tester" monitor is a deliberate-failure test device that gets unplugged all the time. It is matched by
+# name ("Down Tester" in Kuma, case-insensitive, tolerant of stray spaces), shown only in its own panel, and left
+# out of every count, uptime average, banner, grid and chart. PromQL regexes are fully anchored.
+TESTER_RE = "(?i) *down tester *"   # no backslashes: PromQL double-quoted strings reject \s
+NOT_TESTER = 'monitor_name!~"' + TESTER_RE + '"'
+ONLY_TESTER = 'monitor_name=~"' + TESTER_RE + '"'
+STATUS_Q = "monitor_status{" + NOT_TESTER + "}"          # every real monitor
+RESPONSE_Q = "monitor_response_time{" + NOT_TESTER + "}"
+UPTIME_Q = lambda window: 'monitor_uptime_ratio{window="' + window + '",' + NOT_TESTER + '}'
+
 # Green-free versions used by both dashboards: "up" is sapphire, line colours avoid teal and green.
 UP = C["sapphire"]
 HOST_COLORS_M = {"proxmox": C["peach"], "pihole": C["flamingo"], "dockers": C["blue"],
@@ -166,6 +176,25 @@ class Dash:
             "options": {"colorMode": "value", "graphMode": "none", "justifyMode": "center",
                         "orientation": "horizontal", "textMode": "value_and_name", "wideLayout": True,
                         "text": {"valueSize": size, "titleSize": 12},
+                        "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": False}}})
+
+    def tester(self, title, g):
+        """A one-line banner for the down tester, kept apart from the real metrics. Pink when it is down
+        (that is the point of it), lavender when up, grey when Kuma has it paused or it stops reporting."""
+        mappings = [{"type": "value", "options": {
+            "0": {"text": "TESTER DOWN", "color": C["pink"], "index": 0},
+            "1": {"text": "TESTER UP", "color": C["lavender"], "index": 1},
+            "2": {"text": "TESTER RETRYING", "color": PENDING, "index": 2},
+            "3": {"text": "TESTER MAINTENANCE", "color": C["lavender"], "index": 3}}}]
+        return self.add({
+            "id": self.nid(), "type": "stat", "title": title, "datasource": DS, "gridPos": g, "transparent": True,
+            "targets": [self.target("max(monitor_status{" + ONLY_TESTER + "})", "", instant=True)],
+            "fieldConfig": {"defaults": {"unit": "none", "noValue": "TESTER OFFLINE", "mappings": mappings,
+                                         "color": {"mode": "fixed", "fixedColor": MUTED},
+                                         "thresholds": steps((MUTED, None))}, "overrides": []},
+            "options": {"colorMode": "value", "graphMode": "none", "justifyMode": "center",
+                        "orientation": "auto", "textMode": "value", "wideLayout": True,
+                        "text": {"valueSize": 22},
                         "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": False}}})
 
     def status_history(self, title, expr, legend, g, points=40):

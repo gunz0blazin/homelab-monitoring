@@ -70,7 +70,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "(count(monitor_status == 0) or vector(0)) * 10 + (count(monitor_status == 2 or monitor_status == 3) or vector(0))",
+          "expr": "(count(monitor_status{monitor_name!~\"(?i) *down tester *\"} == 0) or vector(0)) * 10 + (count(monitor_status{monitor_name!~\"(?i) *down tester *\"} == 2 or monitor_status{monitor_name!~\"(?i) *down tester *\"} == 3) or vector(0))",
           "legendFormat": "",
           "refId": "A",
           "instant": true,
@@ -173,7 +173,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "count(monitor_status == 1) or vector(0)",
+          "expr": "count(monitor_status{monitor_name!~\"(?i) *down tester *\"} == 1) or vector(0)",
           "legendFormat": "Up",
           "refId": "A",
           "instant": true,
@@ -184,7 +184,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "count(monitor_status == 0) or vector(0)",
+          "expr": "count(monitor_status{monitor_name!~\"(?i) *down tester *\"} == 0) or vector(0)",
           "legendFormat": "Down",
           "refId": "B",
           "instant": true,
@@ -195,7 +195,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "count(monitor_status == 2 or monitor_status == 3) or vector(0)",
+          "expr": "count(monitor_status{monitor_name!~\"(?i) *down tester *\"} == 2 or monitor_status{monitor_name!~\"(?i) *down tester *\"} == 3) or vector(0)",
           "legendFormat": "Pending",
           "refId": "C",
           "instant": true,
@@ -371,7 +371,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "avg(monitor_uptime_ratio{window=\"1d\"}) * 100",
+          "expr": "avg(monitor_uptime_ratio{window=\"1d\",monitor_name!~\"(?i) *down tester *\"}) * 100",
           "legendFormat": "24 hours",
           "refId": "A",
           "instant": true,
@@ -382,7 +382,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "avg(monitor_uptime_ratio{window=\"30d\"}) * 100",
+          "expr": "avg(monitor_uptime_ratio{window=\"30d\",monitor_name!~\"(?i) *down tester *\"}) * 100",
           "legendFormat": "30 days",
           "refId": "B",
           "instant": true,
@@ -533,7 +533,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "monitor_response_time{monitor_type=\"dns\"}",
+          "expr": "monitor_response_time{monitor_type=\"dns\",monitor_name!~\"(?i) *down tester *\"}",
           "legendFormat": "",
           "refId": "A"
         }
@@ -587,6 +587,100 @@
     },
     {
       "id": 5,
+      "type": "stat",
+      "title": "down tester",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 5,
+        "w": 24,
+        "h": 3
+      },
+      "transparent": true,
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "max(monitor_status{monitor_name=~\"(?i) *down tester *\"})",
+          "legendFormat": "",
+          "refId": "A",
+          "instant": true,
+          "range": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "noValue": "TESTER OFFLINE",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "text": "TESTER DOWN",
+                  "color": "#f5c2e7",
+                  "index": 0
+                },
+                "1": {
+                  "text": "TESTER UP",
+                  "color": "#b4befe",
+                  "index": 1
+                },
+                "2": {
+                  "text": "TESTER RETRYING",
+                  "color": "#f9e2af",
+                  "index": 2
+                },
+                "3": {
+                  "text": "TESTER MAINTENANCE",
+                  "color": "#b4befe",
+                  "index": 3
+                }
+              }
+            }
+          ],
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "#6c7086"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#6c7086",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "textMode": "value",
+        "wideLayout": true,
+        "text": {
+          "valueSize": 22
+        },
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        }
+      }
+    },
+    {
+      "id": 6,
       "type": "status-history",
       "title": "last 6 hours",
       "datasource": {
@@ -595,7 +689,7 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 5,
+        "y": 8,
         "w": 24,
         "h": 9
       },
@@ -607,7 +701,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "monitor_status",
+          "expr": "monitor_status{monitor_name!~\"(?i) *down tester *\"}",
           "legendFormat": "{{monitor_name}}",
           "refId": "A"
         }
@@ -688,7 +782,7 @@
       }
     },
     {
-      "id": 6,
+      "id": 7,
       "type": "timeseries",
       "title": "Response time",
       "datasource": {
@@ -697,7 +791,7 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 14,
+        "y": 17,
         "w": 14,
         "h": 14
       },
@@ -707,7 +801,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "monitor_response_time",
+          "expr": "monitor_response_time{monitor_name!~\"(?i) *down tester *\"}",
           "legendFormat": "{{monitor_name}}",
           "refId": "A"
         }
@@ -884,7 +978,7 @@
       }
     },
     {
-      "id": 7,
+      "id": 8,
       "type": "bargauge",
       "title": "Uptime by service, 30 days",
       "datasource": {
@@ -893,7 +987,7 @@
       },
       "gridPos": {
         "x": 14,
-        "y": 14,
+        "y": 17,
         "w": 10,
         "h": 14
       },
@@ -903,7 +997,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "monitor_uptime_ratio{window=\"30d\"} * 100",
+          "expr": "monitor_uptime_ratio{window=\"30d\",monitor_name!~\"(?i) *down tester *\"} * 100",
           "legendFormat": "{{monitor_name}}",
           "refId": "A",
           "instant": true,
@@ -962,20 +1056,20 @@
       "transparent": true
     },
     {
-      "id": 8,
+      "id": 9,
       "type": "row",
       "title": "Hosts (node exporter)",
       "collapsed": false,
       "gridPos": {
         "x": 0,
-        "y": 28,
+        "y": 31,
         "w": 24,
         "h": 1
       },
       "panels": []
     },
     {
-      "id": 9,
+      "id": 10,
       "type": "table",
       "title": "hosts",
       "datasource": {
@@ -984,7 +1078,7 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 29,
+        "y": 32,
         "w": 24,
         "h": 9
       },
@@ -1258,7 +1352,7 @@
       }
     },
     {
-      "id": 10,
+      "id": 11,
       "type": "timeseries",
       "title": "CPU used",
       "datasource": {
@@ -1267,7 +1361,7 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 38,
+        "y": 41,
         "w": 8,
         "h": 8
       },
@@ -1410,7 +1504,7 @@
       }
     },
     {
-      "id": 11,
+      "id": 12,
       "type": "timeseries",
       "title": "Memory used",
       "datasource": {
@@ -1419,7 +1513,7 @@
       },
       "gridPos": {
         "x": 8,
-        "y": 38,
+        "y": 41,
         "w": 8,
         "h": 8
       },
@@ -1562,7 +1656,7 @@
       }
     },
     {
-      "id": 12,
+      "id": 13,
       "type": "timeseries",
       "title": "Disk used (/)",
       "datasource": {
@@ -1571,7 +1665,7 @@
       },
       "gridPos": {
         "x": 16,
-        "y": 38,
+        "y": 41,
         "w": 8,
         "h": 8
       },

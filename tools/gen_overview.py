@@ -33,7 +33,7 @@ D.status_history("Service status, last 6 hours", "monitor_status", "{{monitor_na
 D.timeseries("Response time", "monitor_response_time", "{{monitor_name}}", pos(0, 14, 14, 14), "ms", vmin=0,
              overrides=color_overrides(MONITOR_COLORS_M))
 D.bars("Uptime by service, 30 days", 'monitor_uptime_ratio{window="30d"} * 100', pos(14, 14, 10, 14), UPTIME_M,
-       unit="percent", vmin=90, vmax=100, decimals=2, legend="{{monitor_name}}", display="gradient", transparent=True,
+       unit="percent", vmin=90, vmax=100, decimals=2, legend="{{monitor_name}}", display="basic", transparent=True,
        title_size=12, value_size=14)
 
 # --- hosts: gauges first, trends underneath

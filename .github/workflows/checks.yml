@@ -19,6 +19,18 @@ jobs:
         run: |
           python3 -c "import glob, json; [json.load(open(f)) for f in glob.glob('grafana/dashboards/*.json')]"
 
+      - name: Dashboard card tests
+        run: node tools/ui/test_ui.js
+
+      - name: Dashboards match their generators
+        # The JSON in grafana/dashboards is generated. Regenerate it and fail if anything differs, so the
+        # script and the JSON can't drift apart (a hand edit of the JSON would be lost on the next run).
+        run: |
+          python3 tools/gen_overview.py
+          python3 tools/gen_mobile.py
+          python3 tools/gen_home.py
+          git diff --exit-code -- grafana/dashboards || { echo "Regenerate with the tools/gen_*.py scripts and commit the result"; exit 1; }
+
       - name: Compose file is valid
         run: docker compose -f docker-compose.yml config -q
 

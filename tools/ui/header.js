@@ -4,6 +4,8 @@ function renderHeader(data) {
   const up = first(R, "up", 0), down = first(R, "down", 0), pend = first(R, "pend", 0);
   const total = up + down + pend;
   const uptime = first(R, "up30", NaN);
+  // 1 while Prometheus can scrape Uptime Kuma, 0 when it can't, NaN when there is no such series at all
+  const kuma = first(R, "kup", NaN);
 
   const bad = only(R, "svc").filter((r) => num(r) !== 1 && Number.isFinite(num(r)));
   const downNames = bad.filter((r) => num(r) === 0).map((r) => String(r.monitor_name).trim());
@@ -16,15 +18,22 @@ function renderHeader(data) {
   const offline = hosts.filter((r) => num(r) === 0).map((r) => hostName(r.host)).filter((n) => !covered(n));
   const hostsOn = hosts.filter((r) => num(r) !== 0).length;
 
-  let state = "ok", head = "All systems operational";
-  if (downNames.length || down > 0) { state = "crit"; head = "Service outage"; }
+  // A dashboard that goes quiet when its source dies is the worst failure, so "no data" is never "all clear".
+  let state = "ok", head = "All systems operational", blind = "";
+  if (kuma === 0) {
+    state = "crit"; head = "Monitoring unavailable"; blind = "Uptime Kuma isn't reporting, so these numbers may be out of date";
+  } else if (total === 0 && kuma !== 1) {
+    state = "crit"; head = "No data from Uptime Kuma"; blind = "Check that Uptime Kuma and Prometheus are running";
+  } else if (total === 0) {
+    state = "warn"; head = "No services monitored yet"; blind = "Add monitors in Uptime Kuma";
+  } else if (downNames.length || down > 0) { state = "crit"; head = "Service outage"; }
   else if (waitNames.length || pend > 0 || offline.length) { state = "warn"; head = "Degraded performance"; }
 
   const notes = [];
   if (downNames.length) notes.push(list(downNames) + " down");
   if (waitNames.length) notes.push(list(waitNames) + " pending");
   if (offline.length) notes.push(list(offline) + " offline");
-  const sub = notes.length ? notes.join(" · ") : total + " services and " + hosts.length + " hosts are healthy";
+  const sub = blind || (notes.length ? notes.join(" · ") : total + " services and " + hosts.length + " hosts are healthy");
 
   const stat = (key, value, of, cap) =>
     '<div class="stat"><div class="num"><span class="cnt k_' + key + '">' + value + "</span>" +

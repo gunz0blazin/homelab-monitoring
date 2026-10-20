@@ -81,6 +81,7 @@ def build(kind, uid, title, path, description):
         q("D", 'avg(monitor_uptime_ratio{window="30d"}) * 100', "up30"),
         q("E", 'monitor_status', "svc"),
         q("F", 'up{job="node"}', "hup"),
+        q("G", 'up{job="uptime-kuma"}', "kup"),
     ], "Status")
 
     # 2. hosts and 3. services

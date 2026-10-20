@@ -25,7 +25,7 @@ const hostKeys = ["proxmox", "pihole", "dockers", "tailscale", "plex", "qbittorr
 
 function headerData(over = {}) {
   return frames(rec("up", {}, over.up ?? 9), rec("down", {}, over.down ?? 0), rec("pend", {}, over.pend ?? 0),
-    rec("up30", {}, 99.9812), ...goodServices.map((n, i) => svc(n, over.svc ? over.svc(n, i) : 1)),
+    rec("up30", {}, 99.9812), rec("kup", {}, over.kup ?? 1), ...goodServices.map((n, i) => svc(n, over.svc ? over.svc(n, i) : 1)),
     ...hostKeys.map((h) => rec("hup", { host: h }, over.hup ? over.hup(h) : 1)));
 }
 
@@ -107,9 +107,25 @@ test("header: a pending service does not also say its host is offline", () => {
   assert.strictEqual(html(out).querySelector(".k_hst").textContent, "5", "the host count still shows 5 of 6");
 });
 
-test("header: no data yet does not throw", () => {
+test("header: no data at all is never reported as all clear", () => {
   const out = load("header")([]);
-  assert(out.includes("All systems operational"));
+  assert(!out.includes("All systems operational"), out);
+  assert(out.includes("No data from Uptime Kuma"));
+  assert(html(out).querySelector(".hl").classList.contains("crit"));
+});
+
+test("header: Uptime Kuma not being scraped says monitoring is unavailable, even if the last numbers look fine", () => {
+  const out = load("header")(headerData({ kup: 0 }));
+  assert(!out.includes("All systems operational"), out);
+  assert(out.includes("Monitoring unavailable") && out.includes("may be out of date"));
+  assert(html(out).querySelector(".hl").classList.contains("crit"));
+});
+
+test("header: no monitors yet is a warning, not an outage", () => {
+  const hosts = hostKeys.map((h) => rec("hup", { host: h }, 1));
+  const out = load("header")(frames(rec("up", {}, 0), rec("down", {}, 0), rec("pend", {}, 0), rec("kup", {}, 1), ...hosts));
+  assert(out.includes("No services monitored yet"), out);
+  assert(html(out).querySelector(".hl").classList.contains("warn"));
 });
 
 test("hosts: names, thresholds, static widths", () => {

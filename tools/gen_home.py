@@ -3,7 +3,7 @@
 # Run from the repo root: python3 tools/gen_home.py
 # The three cards (status header, hosts, services) are Business Text panels (plugin id
 # marcusolsson-dynamictext-panel) whose HTML/JS/CSS live in tools/ui/. Edit those, regenerate, and commit
-# the sources and the JSON together. Trend charts sit in a collapsed row and are native Grafana panels.
+# the sources and the JSON together. The main dashboard's graphs (status grid, uptime and latency bars) and the trend charts are native Grafana panels.
 import json
 import os
 import sys
@@ -55,17 +55,20 @@ DSK = ('100 * (1 - (node_filesystem_avail_bytes{mountpoint="/",fstype!~"tmpfs|ov
        'node_filesystem_size_bytes{mountpoint="/",fstype!~"tmpfs|overlay"}))')
 RATE_CPU = CPU.replace("[5m]", "[$__rate_interval]")
 HOSTS = color_overrides(HOST_COLORS_COOL, HOST_NAMES)
-MS_COLORS = [{"matcher": {"id": "byName", "options": "Average"}, "properties": [{"id": "color", "value": {"mode": "fixed", "fixedColor": C["blue"]}}]},
-             {"matcher": {"id": "byName", "options": "Slowest"}, "properties": [{"id": "color", "value": {"mode": "fixed", "fixedColor": C["overlay0"]}}]}]
 
 # Grid layouts (24 columns). Panel order is also the order they stack in on a narrow screen.
 LAYOUTS = {
-    # phone first: full-width header, then hosts and services side by side on a wide screen, 2 x 2 charts
-    "mobile": {"header": pos(0, 0, 24, 5), "hosts": pos(0, 5, 14, 12), "services": pos(14, 5, 10, 12), "row": pos(0, 17, 24, 1),
-               "charts": [pos(0, 18, 12, 8), pos(12, 18, 12, 8), pos(0, 26, 12, 8), pos(12, 26, 12, 8)]},
-    # wide screens: slimmer header, hosts and services half and half, all four charts in one row
-    "desktop": {"header": pos(0, 0, 24, 5), "hosts": pos(0, 5, 12, 12), "services": pos(12, 5, 12, 12), "row": pos(0, 17, 24, 1),
-                "charts": [pos(0, 18, 6, 9), pos(6, 18, 6, 9), pos(12, 18, 6, 9), pos(18, 18, 6, 9)]},
+    # phone first: full-width header, hosts and services side by side on a wide screen, then the main
+    # dashboard's graphs (status grid, uptime and latency bars), then the trend charts
+    "mobile": {"header": pos(0, 0, 24, 7), "hosts": pos(0, 7, 14, 12), "services": pos(14, 7, 10, 12),
+               "grid": pos(0, 19, 24, 11), "pts": 40, "uptime": pos(0, 30, 12, 15), "latency": pos(12, 30, 12, 15),
+               "row": pos(0, 45, 24, 1),
+               "charts": [pos(0, 46, 24, 9), pos(0, 55, 12, 8), pos(12, 55, 12, 8), pos(0, 63, 24, 8)]},
+    # wide screens: hosts and services half and half, then everything from the main dashboard
+    "desktop": {"header": pos(0, 0, 24, 6), "hosts": pos(0, 6, 12, 12), "services": pos(12, 6, 12, 12),
+                "grid": pos(0, 18, 24, 9), "pts": 60, "uptime": pos(0, 27, 12, 11), "latency": pos(12, 27, 12, 11),
+                "row": pos(0, 38, 24, 1),
+                "charts": [pos(0, 39, 24, 10), pos(0, 49, 8, 9), pos(8, 49, 8, 9), pos(16, 49, 8, 9)]},
 }
 
 
@@ -82,6 +85,8 @@ def build(kind, uid, title, path, description):
         q("E", 'monitor_status', "svc"),
         q("F", 'up{job="node"}', "hup"),
         q("G", 'up{job="uptime-kuma"}', "kup"),
+        q("H", 'avg(monitor_uptime_ratio{window="1d"}) * 100', "up1d"),
+        q("I", 'avg(monitor_response_time{monitor_type="dns"})', "dns"),
     ], "Status")
 
     # 2. hosts and 3. services
@@ -94,13 +99,24 @@ def build(kind, uid, title, path, description):
         q("C", 'monitor_uptime_ratio{window="30d"} * 100', "svcup"),
     ], "Services")
 
-    # 4. trends: open by default (an expanded row has an empty `panels` list and its charts follow it at the
+    # 4. the main dashboard's graphs, in the calm style: status grid, uptime bars, latency bars
+    D.status_history("Service status, last 6 hours", "monitor_status", "{{monitor_name}}", g["grid"], points=g["pts"],
+                     desc="One row per service. Blue is up, red is down, yellow is retrying.")
+    D.bars("Uptime by service, 30 days", 'monitor_uptime_ratio{window="30d"} * 100', g["uptime"], UPTIME_M,
+           unit="percent", vmin=90, vmax=100, decimals=2, legend="{{monitor_name}}", display="basic", transparent=True,
+           title_size=12, value_size=14)
+    D.bars("Latency now", "monitor_response_time", g["latency"], steps((INFO, None)), unit="ms", vmin=0, vmax=None,
+           legend="{{monitor_name}}", display="gradient", overrides=color_overrides(MONITOR_COLORS_M), transparent=True,
+           title_size=12, value_size=14, desc="Most recent check time for each service.")
+
+    # 5. trends: open by default (an expanded row has an empty `panels` list and its charts follow it at the
     # top level; to collapse it, set "collapsed" to True and move the charts into the row's `panels`)
     D.add({"id": D.nid(), "type": "row", "title": "Trends", "collapsed": False, "gridPos": g["row"], "panels": []})
     c = g["charts"]
     for chart in (
-        D.calm_timeseries("Response time", [("avg(monitor_response_time)", "Average"), ("max(monitor_response_time)", "Slowest")],
-                          c[0], "ms", vmin=0, overrides=MS_COLORS, desc="Average and slowest check time across all services."),
+        D.calm_timeseries("Response time", [("monitor_response_time", "{{monitor_name}}")], c[0], "ms", vmin=0,
+                          overrides=color_overrides(MONITOR_COLORS_M), legend=True,
+                          desc="Check time for each service over the selected time range."),
         D.calm_timeseries("CPU", [(RATE_CPU, "{{host}}")], c[1], "percent", 0, 100, HOSTS),
         D.calm_timeseries("Memory", [(MEM, "{{host}}")], c[2], "percent", 0, 100, HOSTS),
         D.calm_timeseries("Disk", [(DSK, "{{host}}")], c[3], "percent", 0, 100, HOSTS),

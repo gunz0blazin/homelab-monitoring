@@ -3,7 +3,7 @@ function renderHeader(data) {
   const R = records(data);
   const up = first(R, "up", 0), down = first(R, "down", 0), pend = first(R, "pend", 0);
   const total = up + down + pend;
-  const uptime = first(R, "up30", NaN);
+  const uptime = first(R, "up30", NaN), uptime1d = first(R, "up1d", NaN), dns = first(R, "dns", NaN);
   // 1 while Prometheus can scrape Uptime Kuma, 0 when it can't, NaN when there is no such series at all
   const kuma = first(R, "kup", NaN);
 
@@ -40,6 +40,12 @@ function renderHeader(data) {
     '<div class="stat"><div class="num"><span class="cnt k_' + key + '">' + value + "</span>" +
     (of === "" ? "" : '<span class="of"> ' + of + "</span>") + '</div><div class="cap">' + cap + "</div></div>";
 
+  // second row: the smaller numbers. Zero down/pending stays grey; DNS and uptime take a tone when they slip.
+  const mini = (key, value, cap, t) =>
+    '<div class="mstat"><div class="mnum ' + (t || "") + '"><span class="cnt k_' + key + '">' + value + '</span></div><div class="cap">' + cap + "</div></div>";
+  const upTone = (v) => (!Number.isFinite(v) ? "" : v < 95 ? "crit" : v < 99 ? "warn" : "");
+  const dnsTone = !Number.isFinite(dns) ? "" : dns >= 500 ? "crit" : dns >= 100 ? "warn" : "";
+
   return wrap("head " + state,
     '<div class="lead"><span class="dot"></span><div class="msg"><div class="h">' + esc(head) +
     '</div><div class="s">' + esc(sub) + "</div></div></div>" +
@@ -47,6 +53,11 @@ function renderHeader(data) {
     stat("svc", up, "of " + total, "Services up") +
     stat("hst", hostsOn, "of " + hosts.length, "Hosts online") +
     stat("up30", pct(uptime), "", "Uptime, 30 days") +
+    '</div><div class="stats2">' +
+    mini("down", down, "Down", down > 0 ? "crit" : "zero") +
+    mini("pend", pend, "Pending", pend > 0 ? "warn" : "zero") +
+    mini("up1d", pct(uptime1d), "Uptime, 24 hours", upTone(uptime1d)) +
+    mini("dns", Number.isFinite(dns) ? Math.round(dns) + " ms" : "n/a", "DNS response", dnsTone) +
     "</div>");
 }
 context.handlebars.registerHelper("header", (data) => renderHeader(data));

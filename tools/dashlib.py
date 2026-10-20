@@ -162,7 +162,7 @@ class Dash:
             "fieldConfig": {"defaults": d, "overrides": overrides or []},
             "options": {"legend": legend_opts, "tooltip": {"mode": "multi", "sort": "desc"}}})
 
-    def calm_timeseries(self, title, targets, g, unit, vmin=None, vmax=None, overrides=None, desc="", decimals=0):
+    def calm_timeseries(self, title, targets, g, unit, vmin=None, vmax=None, overrides=None, desc="", decimals=0, legend=False):
         """Quiet trend chart for the detail rows: thin smooth line, soft fill, no legend, no points, no axis
         border or grid. Hover shows every series. targets = [(expr, legend)]."""
         d = {"unit": unit, "decimals": decimals, "color": {"mode": "palette-classic"},
@@ -181,7 +181,7 @@ class Dash:
         return {"id": self.nid(), "type": "timeseries", "title": title, "description": desc, "datasource": DS,
                 "gridPos": g, "transparent": True, "targets": tg,
                 "fieldConfig": {"defaults": d, "overrides": overrides or []},
-                "options": {"legend": {"showLegend": False, "displayMode": "list", "placement": "bottom", "calcs": []},
+                "options": {"legend": {"showLegend": legend, "displayMode": "list", "placement": "bottom", "calcs": []},
                             "tooltip": {"mode": "multi", "sort": "desc"}}}
 
     def hero(self, title, expr, g, up=None):

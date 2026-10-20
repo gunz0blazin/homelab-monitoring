@@ -89,6 +89,33 @@ test("header: healthy", () => {
   assert(d.querySelector(".hl").classList.contains("ok"));
 });
 
+test("header: second row shows down, pending, 24 h uptime and DNS", () => {
+  const data = headerData();
+  data[0].push(rec("up1d", {}, 100), rec("dns", {}, 12.4));
+  const d = html(load("header")(data));
+  assert.strictEqual(d.querySelectorAll(".mstat").length, 4);
+  assert.strictEqual(d.querySelector(".k_down").textContent, "0");
+  assert(d.querySelector(".k_down").parent.classList.contains("zero"), "zero down is calm grey");
+  assert.strictEqual(d.querySelector(".k_up1d").textContent, "100%");
+  assert.strictEqual(d.querySelector(".k_dns").textContent, "12 ms");
+});
+
+test("header: slow DNS, a down service and low uptime take a tone", () => {
+  const data = headerData({ down: 1, up: 8, pend: 2 });
+  data[0].push(rec("up1d", {}, 93.2), rec("dns", {}, 620));
+  const d = html(load("header")(data));
+  assert(d.querySelector(".k_down").parent.classList.contains("crit"));
+  assert(d.querySelector(".k_pend").parent.classList.contains("warn"));
+  assert(d.querySelector(".k_up1d").parent.classList.contains("crit"));
+  assert(d.querySelector(".k_dns").parent.classList.contains("crit"));
+});
+
+test("header: DNS and 24 h uptime show n/a when the series is missing", () => {
+  const d = html(load("header")(headerData()));
+  assert.strictEqual(d.querySelector(".k_dns").textContent, "n/a");
+  assert.strictEqual(d.querySelector(".k_up1d").textContent, "n/a");
+});
+
 test("header: a service is down", () => {
   const out = load("header")(headerData({ down: 1, up: 8, svc: (n) => (n === "Plex" ? 0 : 1) }));
   assert(out.includes("Service outage") && out.includes("Plex down"));

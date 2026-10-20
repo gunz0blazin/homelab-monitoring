@@ -60,15 +60,17 @@ HOSTS = color_overrides(HOST_COLORS_COOL, HOST_NAMES)
 LAYOUTS = {
     # phone first: full-width header, hosts and services side by side on a wide screen, then the main
     # dashboard's graphs (status grid, uptime and latency bars), then the trend charts
-    "mobile": {"header": pos(0, 0, 24, 7), "hosts": pos(0, 7, 14, 12), "services": pos(14, 7, 10, 12),
-               "grid": pos(0, 19, 24, 11), "pts": 40, "uptime": pos(0, 30, 12, 15), "latency": pos(12, 30, 12, 15),
-               "row": pos(0, 45, 24, 1),
-               "charts": [pos(0, 46, 24, 9), pos(0, 55, 12, 8), pos(12, 55, 12, 8), pos(0, 63, 24, 8)]},
+    "mobile": {"header": pos(0, 0, 24, 7), "tester": pos(0, 7, 24, 3),
+               "hosts": pos(0, 10, 14, 12), "services": pos(14, 10, 10, 12),
+               "grid": pos(0, 22, 24, 11), "pts": 40, "uptime": pos(0, 33, 12, 15), "latency": pos(12, 33, 12, 15),
+               "row": pos(0, 48, 24, 1),
+               "charts": [pos(0, 49, 24, 9), pos(0, 58, 12, 8), pos(12, 58, 12, 8), pos(0, 66, 24, 8)]},
     # wide screens: hosts and services half and half, then everything from the main dashboard
-    "desktop": {"header": pos(0, 0, 24, 6), "hosts": pos(0, 6, 12, 12), "services": pos(12, 6, 12, 12),
-                "grid": pos(0, 18, 24, 9), "pts": 60, "uptime": pos(0, 27, 12, 11), "latency": pos(12, 27, 12, 11),
-                "row": pos(0, 38, 24, 1),
-                "charts": [pos(0, 39, 24, 10), pos(0, 49, 8, 9), pos(8, 49, 8, 9), pos(16, 49, 8, 9)]},
+    "desktop": {"header": pos(0, 0, 24, 6), "tester": pos(0, 6, 24, 3),
+                "hosts": pos(0, 9, 12, 12), "services": pos(12, 9, 12, 12),
+                "grid": pos(0, 21, 24, 9), "pts": 60, "uptime": pos(0, 30, 12, 11), "latency": pos(12, 30, 12, 11),
+                "row": pos(0, 41, 24, 1),
+                "charts": [pos(0, 42, 24, 10), pos(0, 52, 8, 9), pos(8, 52, 8, 9), pos(16, 52, 8, 9)]},
 }
 
 
@@ -78,16 +80,19 @@ def build(kind, uid, title, path, description):
 
     # 1. status header: is everything up, and if not, what
     card(D, g["header"], "header.js", "header", [
-        q("A", 'count(monitor_status == 1) or vector(0)', "up"),
-        q("B", 'count(monitor_status == 0) or vector(0)', "down"),
-        q("C", 'count(monitor_status == 2 or monitor_status == 3) or vector(0)', "pend"),
-        q("D", 'avg(monitor_uptime_ratio{window="30d"}) * 100', "up30"),
-        q("E", 'monitor_status', "svc"),
+        q("A", 'count(' + STATUS_Q + ' == 1) or vector(0)', "up"),
+        q("B", 'count(' + STATUS_Q + ' == 0) or vector(0)', "down"),
+        q("C", 'count(' + STATUS_Q + ' == 2 or ' + STATUS_Q + ' == 3) or vector(0)', "pend"),
+        q("D", 'avg(' + UPTIME_Q("30d") + ') * 100', "up30"),
+        q("E", STATUS_Q, "svc"),
         q("F", 'up{job="node"}', "hup"),
         q("G", 'up{job="uptime-kuma"}', "kup"),
-        q("H", 'avg(monitor_uptime_ratio{window="1d"}) * 100', "up1d"),
-        q("I", 'avg(monitor_response_time{monitor_type="dns"})', "dns"),
+        q("H", 'avg(' + UPTIME_Q("1d") + ') * 100', "up1d"),
+        q("I", 'avg(monitor_response_time{monitor_type="dns",' + NOT_TESTER + '})', "dns"),
     ], "Status")
+
+    # 1b. the Down Tester, on its own line and in none of the numbers above or below
+    D.tester(g["tester"])
 
     # 2. hosts and 3. services
     card(D, g["hosts"], "hosts.js", "hosts", [
@@ -95,17 +100,17 @@ def build(kind, uid, title, path, description):
         q("C", f"max by (host) ({DSK})", "dsk"), q("D", 'up{job="node"}', "hup"),
     ], "Hosts")
     card(D, g["services"], "services.js", "services", [
-        q("A", "monitor_status", "svc"), q("B", "monitor_response_time", "resp"),
-        q("C", 'monitor_uptime_ratio{window="30d"} * 100', "svcup"),
+        q("A", STATUS_Q, "svc"), q("B", RESPONSE_Q, "resp"),
+        q("C", UPTIME_Q("30d") + " * 100", "svcup"),
     ], "Services")
 
     # 4. the main dashboard's graphs, in the calm style: status grid, uptime bars, latency bars
-    D.status_history("Service status, last 6 hours", "monitor_status", "{{monitor_name}}", g["grid"], points=g["pts"],
+    D.status_history("Service status, last 6 hours", STATUS_Q, "{{monitor_name}}", g["grid"], points=g["pts"],
                      desc="One row per service. Blue is up, red is down, yellow is retrying.")
-    D.bars("Uptime by service, 30 days", 'monitor_uptime_ratio{window="30d"} * 100', g["uptime"], UPTIME_M,
+    D.bars("Uptime by service, 30 days", UPTIME_Q("30d") + " * 100", g["uptime"], UPTIME_M,
            unit="percent", vmin=90, vmax=100, decimals=2, legend="{{monitor_name}}", display="basic", transparent=True,
            title_size=12, value_size=14)
-    D.bars("Latency now", "monitor_response_time", g["latency"], steps((INFO, None)), unit="ms", vmin=0, vmax=None,
+    D.bars("Latency now", RESPONSE_Q, g["latency"], steps((INFO, None)), unit="ms", vmin=0, vmax=None,
            legend="{{monitor_name}}", display="gradient", overrides=color_overrides(MONITOR_COLORS_M), transparent=True,
            title_size=12, value_size=14, desc="Most recent check time for each service.")
 
@@ -114,7 +119,7 @@ def build(kind, uid, title, path, description):
     D.add({"id": D.nid(), "type": "row", "title": "Trends", "collapsed": False, "gridPos": g["row"], "panels": []})
     c = g["charts"]
     for chart in (
-        D.calm_timeseries("Response time", [("monitor_response_time", "{{monitor_name}}")], c[0], "ms", vmin=0,
+        D.calm_timeseries("Response time", [(RESPONSE_Q, "{{monitor_name}}")], c[0], "ms", vmin=0,
                           overrides=color_overrides(MONITOR_COLORS_M), legend=True,
                           desc="Check time for each service over the selected time range."),
         D.calm_timeseries("CPU", [(RATE_CPU, "{{host}}")], c[1], "percent", 0, 100, HOSTS),

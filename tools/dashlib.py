@@ -77,11 +77,26 @@ def nav_links(current_uid):
     return [(title, url) for uid, title, url in NAV if uid != current_uid]
 
 
+# The "Down Tester" monitor is a test device that is deliberately down and often unplugged. It is matched by
+# name (case-insensitive, tolerant of stray spaces), shown only in its own tester() panel, and left out of every
+# count, uptime average, banner, grid, bar and chart. PromQL regexes are fully anchored. No backslashes here:
+# PromQL double-quoted strings reject \s. Any new panel that queries monitor_* must use these, not the bare metric.
+TESTER_RE = "(?i) *down tester *"
+NOT_TESTER = 'monitor_name!~"' + TESTER_RE + '"'
+ONLY_TESTER = 'monitor_name=~"' + TESTER_RE + '"'
+STATUS_Q = "monitor_status{" + NOT_TESTER + "}"
+RESPONSE_Q = "monitor_response_time{" + NOT_TESTER + "}"
+
+
+def UPTIME_Q(window):
+    return 'monitor_uptime_ratio{window="' + window + '",' + NOT_TESTER + '}'
+
+
 # Banner value for hero(): down * 10 + pending, plus 1000 when Prometheus isn't scraping Uptime Kuma or no
 # monitor series exist at all. Without the 1000s, "Kuma is gone" counted as zero problems and read all clear.
-HERO_EXPR = ('(count(monitor_status == 0) or vector(0)) * 10'
-             ' + (count(monitor_status == 2 or monitor_status == 3) or vector(0))'
-             ' + (1 - clamp_max(count(monitor_status) or vector(0), 1)) * 1000'
+HERO_EXPR = ('(count(' + STATUS_Q + ' == 0) or vector(0)) * 10'
+             ' + (count(' + STATUS_Q + ' == 2 or ' + STATUS_Q + ' == 3) or vector(0))'
+             ' + (1 - clamp_max(count(' + STATUS_Q + ') or vector(0), 1)) * 1000'
              ' + (1 - (max(up{job="uptime-kuma"}) or vector(0))) * 1000')
 
 
@@ -227,6 +242,26 @@ class Dash:
             "options": {"colorMode": "value", "graphMode": "none", "justifyMode": "center",
                         "orientation": "horizontal", "textMode": "value_and_name", "wideLayout": True,
                         "text": {"valueSize": size, "titleSize": 12},
+                        "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": False}}})
+
+    def tester(self, g, title="Down Tester"):
+        """One quiet line for the Down Tester, kept apart from the real metrics. Pink when it is down (that is
+        its normal job), lavender when up, grey "Offline" when Kuma has it paused or it stops reporting."""
+        mappings = [{"type": "value", "options": {
+            "0": {"text": "Down", "color": C["pink"], "index": 0},
+            "1": {"text": "Up", "color": C["lavender"], "index": 1},
+            "2": {"text": "Retrying", "color": PENDING, "index": 2},
+            "3": {"text": "Maintenance", "color": C["lavender"], "index": 3}}}]
+        return self.add({
+            "id": self.nid(), "type": "stat", "title": title, "datasource": DS, "gridPos": g, "transparent": True,
+            "description": "The test monitor. It is left out of every count, average and chart on this dashboard.",
+            "targets": [self.target("max(monitor_status{" + ONLY_TESTER + "})", "", instant=True)],
+            "fieldConfig": {"defaults": {"unit": "none", "noValue": "Offline", "mappings": mappings,
+                                         "color": {"mode": "thresholds"}, "thresholds": steps((MUTED, None))},
+                            "overrides": []},
+            "options": {"colorMode": "value", "graphMode": "none", "justifyMode": "center",
+                        "orientation": "auto", "textMode": "value", "wideLayout": True,
+                        "text": {"valueSize": 22, "titleSize": 12},
                         "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": False}}})
 
     def status_history(self, title, expr, legend, g, points=40, desc=""):

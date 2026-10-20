@@ -95,7 +95,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "(count(monitor_status == 0) or vector(0)) * 10 + (count(monitor_status == 2 or monitor_status == 3) or vector(0)) + (1 - clamp_max(count(monitor_status) or vector(0), 1)) * 1000 + (1 - (max(up{job=\"uptime-kuma\"}) or vector(0))) * 1000",
+          "expr": "(count(monitor_status{monitor_name!~\"(?i) *down tester *\"} == 0) or vector(0)) * 10 + (count(monitor_status{monitor_name!~\"(?i) *down tester *\"} == 2 or monitor_status{monitor_name!~\"(?i) *down tester *\"} == 3) or vector(0)) + (1 - clamp_max(count(monitor_status{monitor_name!~\"(?i) *down tester *\"}) or vector(0), 1)) * 1000 + (1 - (max(up{job=\"uptime-kuma\"}) or vector(0))) * 1000",
           "legendFormat": "",
           "refId": "A",
           "instant": true,
@@ -210,7 +210,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "count(monitor_status == 1) or vector(0)",
+          "expr": "count(monitor_status{monitor_name!~\"(?i) *down tester *\"} == 1) or vector(0)",
           "legendFormat": "Up",
           "refId": "A",
           "instant": true,
@@ -221,7 +221,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "count(monitor_status == 0) or vector(0)",
+          "expr": "count(monitor_status{monitor_name!~\"(?i) *down tester *\"} == 0) or vector(0)",
           "legendFormat": "Down",
           "refId": "B",
           "instant": true,
@@ -232,7 +232,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "count(monitor_status == 2 or monitor_status == 3) or vector(0)",
+          "expr": "count(monitor_status{monitor_name!~\"(?i) *down tester *\"} == 2 or monitor_status{monitor_name!~\"(?i) *down tester *\"} == 3) or vector(0)",
           "legendFormat": "Pending",
           "refId": "C",
           "instant": true,
@@ -408,7 +408,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "avg(monitor_uptime_ratio{window=\"1d\"}) * 100",
+          "expr": "avg(monitor_uptime_ratio{window=\"1d\",monitor_name!~\"(?i) *down tester *\"}) * 100",
           "legendFormat": "24 hours",
           "refId": "A",
           "instant": true,
@@ -419,7 +419,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "avg(monitor_uptime_ratio{window=\"30d\"}) * 100",
+          "expr": "avg(monitor_uptime_ratio{window=\"30d\",monitor_name!~\"(?i) *down tester *\"}) * 100",
           "legendFormat": "30 days",
           "refId": "B",
           "instant": true,
@@ -550,6 +550,101 @@
     },
     {
       "id": 4,
+      "type": "stat",
+      "title": "Down Tester",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 13,
+        "w": 24,
+        "h": 3
+      },
+      "transparent": true,
+      "description": "The test monitor. It is left out of every count, average and chart on this dashboard.",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "max(monitor_status{monitor_name=~\"(?i) *down tester *\"})",
+          "legendFormat": "",
+          "refId": "A",
+          "instant": true,
+          "range": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "noValue": "Offline",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "text": "Down",
+                  "color": "#f5c2e7",
+                  "index": 0
+                },
+                "1": {
+                  "text": "Up",
+                  "color": "#b4befe",
+                  "index": 1
+                },
+                "2": {
+                  "text": "Retrying",
+                  "color": "#f9e2af",
+                  "index": 2
+                },
+                "3": {
+                  "text": "Maintenance",
+                  "color": "#b4befe",
+                  "index": 3
+                }
+              }
+            }
+          ],
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#6c7086",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "textMode": "value",
+        "wideLayout": true,
+        "text": {
+          "valueSize": 22,
+          "titleSize": 12
+        },
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        }
+      }
+    },
+    {
+      "id": 5,
       "type": "status-history",
       "title": "Service status, last 6 hours",
       "description": "One row per service. Each cell is about 10 minutes; blue is up, red is down, yellow is retrying.",
@@ -559,7 +654,7 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 13,
+        "y": 16,
         "w": 24,
         "h": 11
       },
@@ -571,7 +666,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "monitor_status",
+          "expr": "monitor_status{monitor_name!~\"(?i) *down tester *\"}",
           "legendFormat": "{{monitor_name}}",
           "refId": "A"
         }
@@ -652,7 +747,7 @@
       }
     },
     {
-      "id": 5,
+      "id": 6,
       "type": "table",
       "title": "Host health",
       "description": "Current CPU, memory and root-disk use for each machine. Bars turn orange at 75% and red at 90%.",
@@ -662,7 +757,7 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 24,
+        "y": 27,
         "w": 24,
         "h": 11
       },
@@ -982,7 +1077,7 @@
       }
     },
     {
-      "id": 6,
+      "id": 7,
       "type": "bargauge",
       "title": "Latency now",
       "description": "Most recent check time for each service.",
@@ -992,7 +1087,7 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 35,
+        "y": 38,
         "w": 24,
         "h": 15
       },
@@ -1002,7 +1097,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "monitor_response_time",
+          "expr": "monitor_response_time{monitor_name!~\"(?i) *down tester *\"}",
           "legendFormat": "{{monitor_name}}",
           "refId": "A",
           "instant": true,
@@ -1188,7 +1283,7 @@
       "transparent": true
     },
     {
-      "id": 7,
+      "id": 8,
       "type": "timeseries",
       "title": "Response time",
       "description": "Check time for each service over the selected time range.",
@@ -1198,7 +1293,7 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 50,
+        "y": 53,
         "w": 24,
         "h": 8
       },
@@ -1208,7 +1303,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "monitor_response_time",
+          "expr": "monitor_response_time{monitor_name!~\"(?i) *down tester *\"}",
           "legendFormat": "{{monitor_name}}",
           "refId": "A"
         }

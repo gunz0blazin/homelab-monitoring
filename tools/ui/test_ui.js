@@ -6,7 +6,7 @@ const path = require("path");
 const assert = require("assert");
 
 const dash = JSON.parse(fs.readFileSync(path.join(__dirname, "../../grafana/dashboards/homelab.json"), "utf8"));
-const panel = (helper) => dash.panels.find((p) => p.options && p.options.content.includes("{{{" + helper + " "));
+const panel = (helper) => dash.panels.find((p) => p.options && p.options.content && p.options.content.includes("{{{" + helper + " "));
 
 // run a card's "before content rendering" code and return the helper it registers
 function load(helper) {

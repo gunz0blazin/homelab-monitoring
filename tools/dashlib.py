@@ -92,6 +92,19 @@ def UPTIME_Q(window):
     return 'monitor_uptime_ratio{window="' + window + '",' + NOT_TESTER + '}'
 
 
+def tester_series():
+    """The Down Tester as one more value in a multi_stat box (the Up / Down / Pending one), so it sits in the top
+    box instead of getting a section of its own. Pink "Down" (its normal job), lavender "Up", grey "Off" when Kuma
+    has it paused or it stops reporting. Short words, because four values share the box."""
+    mappings = [{"type": "value", "options": {
+        "0": {"text": "Down", "color": C["pink"], "index": 0},
+        "1": {"text": "Up", "color": C["lavender"], "index": 1},
+        "2": {"text": "Retry", "color": PENDING, "index": 2},
+        "3": {"text": "Maint", "color": C["lavender"], "index": 3}}}]
+    return ("Tester", "max(monitor_status{" + ONLY_TESTER + "})", steps((MUTED, None)), "none", 0,
+            [{"id": "mappings", "value": mappings}, {"id": "noValue", "value": "Off"}])
+
+
 # Banner value for hero(): down * 10 + pending, plus 1000 when Prometheus isn't scraping Uptime Kuma or no
 # monitor series exist at all. Without the 1000s, "Kuma is gone" counted as zero problems and read all clear.
 HERO_EXPR = ('(count(' + STATUS_Q + ' == 0) or vector(0)) * 10'
@@ -223,9 +236,10 @@ class Dash:
 
     def multi_stat(self, title, series, g, size=38):
         """Several numbers side by side inside ONE panel. Grafana stacks panels in a single column on a phone,
-        so this is how a row of tiles survives on mobile. series = [(name, expr, thresholds, unit, decimals)]."""
+        so this is how a row of tiles survives on mobile. series = [(name, expr, thresholds, unit, decimals)],
+        each optionally followed by a list of extra override properties (value mappings, noValue)."""
         targets, overrides = [], []
-        for i, (name, expr, th, unit, dec) in enumerate(series):
+        for i, (name, expr, th, unit, dec, *extra) in enumerate(series):
             t = self.target(expr, name, instant=True)
             t["refId"] = chr(65 + i)
             targets.append(t)
@@ -233,6 +247,7 @@ class Dash:
                      {"id": "unit", "value": unit}]
             if dec is not None:
                 props.append({"id": "decimals", "value": dec})
+            props.extend(extra[0] if extra else [])
             overrides.append({"matcher": {"id": "byName", "options": name}, "properties": props})
         return self.add({
             "id": self.nid(), "type": "stat", "title": title, "datasource": DS, "gridPos": g, "transparent": True,
@@ -242,26 +257,6 @@ class Dash:
             "options": {"colorMode": "value", "graphMode": "none", "justifyMode": "center",
                         "orientation": "horizontal", "textMode": "value_and_name", "wideLayout": True,
                         "text": {"valueSize": size, "titleSize": 12},
-                        "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": False}}})
-
-    def tester(self, g, title="Down Tester"):
-        """One quiet line for the Down Tester, kept apart from the real metrics. Pink when it is down (that is
-        its normal job), lavender when up, grey "Offline" when Kuma has it paused or it stops reporting."""
-        mappings = [{"type": "value", "options": {
-            "0": {"text": "Down", "color": C["pink"], "index": 0},
-            "1": {"text": "Up", "color": C["lavender"], "index": 1},
-            "2": {"text": "Retrying", "color": PENDING, "index": 2},
-            "3": {"text": "Maintenance", "color": C["lavender"], "index": 3}}}]
-        return self.add({
-            "id": self.nid(), "type": "stat", "title": title, "datasource": DS, "gridPos": g, "transparent": True,
-            "description": "The test monitor. It is left out of every count, average and chart on this dashboard.",
-            "targets": [self.target("max(monitor_status{" + ONLY_TESTER + "})", "", instant=True)],
-            "fieldConfig": {"defaults": {"unit": "none", "noValue": "Offline", "mappings": mappings,
-                                         "color": {"mode": "thresholds"}, "thresholds": steps((MUTED, None))},
-                            "overrides": []},
-            "options": {"colorMode": "value", "graphMode": "none", "justifyMode": "center",
-                        "orientation": "auto", "textMode": "value", "wideLayout": True,
-                        "text": {"valueSize": 22, "titleSize": 12},
                         "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": False}}})
 
     def status_history(self, title, expr, legend, g, points=40, desc=""):

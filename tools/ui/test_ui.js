@@ -93,11 +93,34 @@ test("header: second row shows down, pending, 24 h uptime and DNS", () => {
   const data = headerData();
   data[0].push(rec("up1d", {}, 100), rec("dns", {}, 12.4));
   const d = html(load("header")(data));
-  assert.strictEqual(d.querySelectorAll(".mstat").length, 4);
+  assert.strictEqual(d.querySelectorAll(".mstat").length, 5);   // down, pending, 24 h uptime, DNS, tester
   assert.strictEqual(d.querySelector(".k_down").textContent, "0");
   assert(d.querySelector(".k_down").parent.classList.contains("zero"), "zero down is calm grey");
   assert.strictEqual(d.querySelector(".k_up1d").textContent, "100%");
   assert.strictEqual(d.querySelector(".k_dns").textContent, "12 ms");
+});
+
+test("header: the Down Tester shows in the second row and never changes the headline", () => {
+  const word = (data) => html(load("header")(data)).querySelector(".tester .mnum");
+  // down is its normal state: pink word, and the card still reads all clear
+  const downData = headerData();
+  downData[0].push(rec("tester", {}, 0));
+  const down = word(downData);
+  assert.strictEqual(down.textContent, "Down");
+  assert(down.classList.contains("pink") && !down.classList.contains("crit"), "pink, not a warning colour");
+  const out = load("header")(downData);
+  assert(out.includes("All systems operational") && html(out).querySelector(".hl").classList.contains("ok"));
+  assert(!out.includes("Service outage") && !out.includes("Degraded"));
+  // up, retrying, maintenance
+  for (const [v, text] of [[1, "Up"], [2, "Retry"], [3, "Maint"]]) {
+    const data = headerData();
+    data[0].push(rec("tester", {}, v));
+    assert.strictEqual(word(data).textContent, text);
+  }
+  // paused in Kuma, or not reporting: grey "Off", never an error
+  const off = word(headerData());
+  assert.strictEqual(off.textContent, "Off");
+  assert(off.classList.contains("zero"));
 });
 
 test("header: slow DNS, a down service and low uptime take a tone", () => {

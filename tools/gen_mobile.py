@@ -23,7 +23,8 @@ D.multi_stat("Services", [
     ("Up", 'count(' + STATUS_Q + ' == 1) or vector(0)', steps((UP, None)), "none", 0),
     ("Down", 'count(' + STATUS_Q + ' == 0) or vector(0)', quiet(BAD), "none", 0),
     ("Pending", 'count(' + STATUS_Q + ' == 2 or ' + STATUS_Q + ' == 3) or vector(0)', quiet(PENDING), "none", 0),
-], pos(0, 4, 24, 5), size=44)
+    tester_series(),   # the Down Tester: shown here, counted in nothing
+], pos(0, 4, 24, 5), size=36)
 
 # 3. uptime, side by side
 D.multi_stat("Uptime", [
@@ -31,11 +32,8 @@ D.multi_stat("Uptime", [
     ("30 days", 'avg(' + UPTIME_Q("30d") + ') * 100', UPTIME_M, "percent", 2),
 ], pos(0, 9, 24, 4), size=30)
 
-# 3b. the Down Tester, on its own line and in none of the numbers above or below
-D.tester(pos(0, 13, 24, 3))
-
 # 4. one row per service, one cell per ~10 minutes of the last 6 hours
-D.status_history("Service status, last 6 hours", STATUS_Q, "{{monitor_name}}", pos(0, 16, 24, 11),
+D.status_history("Service status, last 6 hours", STATUS_Q, "{{monitor_name}}", pos(0, 13, 24, 11),
                 desc="One row per service. Each cell is about 10 minutes; blue is up, red is down, yellow is retrying.")
 
 # 5. one row per host, CPU / memory / disk as gradient gauges
@@ -43,16 +41,16 @@ D.host_table("Host health", [
     ("CPU", 'max by (host) (100 * (1 - (sum by (host) (rate(node_cpu_seconds_total{mode="idle"}[5m])) / sum by (host) (rate(node_cpu_seconds_total[5m])))))', C["blue"]),
     ("Memory", 'max by (host) (100 * (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)))', C["mauve"]),
     ("Disk", 'max by (host) (100 * (1 - (node_filesystem_avail_bytes{mountpoint="/",fstype!~"tmpfs|overlay"} / node_filesystem_size_bytes{mountpoint="/",fstype!~"tmpfs|overlay"})))', C["lavender"]),
-], pos(0, 27, 24, 11), desc="Current CPU, memory and root-disk use for each machine. Bars turn orange at 75% and red at 90%.")
+], pos(0, 24, 24, 11), desc="Current CPU, memory and root-disk use for each machine. Bars turn orange at 75% and red at 90%.")
 
 # 6. latest response time per service, each bar in its own Mocha colour
-D.bars("Latency now", RESPONSE_Q, pos(0, 38, 24, 15), steps((INFO, None)), unit="ms", vmin=0, vmax=None,
+D.bars("Latency now", RESPONSE_Q, pos(0, 35, 24, 15), steps((INFO, None)), unit="ms", vmin=0, vmax=None,
        legend="{{monitor_name}}", display="gradient", overrides=color_overrides(MONITOR_COLORS_M), transparent=True,
        title_size=12, value_size=14,
        desc="Most recent check time for each service.")   # 9 bars: ~50 px each so the names and values aren't clipped
 
 # 7. response time over the last 6 hours
-D.timeseries("Response time", RESPONSE_Q, "{{monitor_name}}", pos(0, 53, 24, 8), "ms", vmin=0,
+D.timeseries("Response time", RESPONSE_Q, "{{monitor_name}}", pos(0, 50, 24, 8), "ms", vmin=0,
              overrides=color_overrides(MONITOR_COLORS_M), table_legend=False,
              desc="Check time for each service over the selected time range.")
 

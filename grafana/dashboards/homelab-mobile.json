@@ -237,6 +237,17 @@
           "refId": "C",
           "instant": true,
           "range": false
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "max(monitor_status{monitor_name=~\"(?i) *down tester *\"})",
+          "legendFormat": "Tester",
+          "refId": "D",
+          "instant": true,
+          "range": false
         }
       ],
       "fieldConfig": {
@@ -364,6 +375,74 @@
                 "value": 0
               }
             ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Tester"
+            },
+            "properties": [
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "#6c7086",
+                      "value": null
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "thresholds"
+                }
+              },
+              {
+                "id": "unit",
+                "value": "none"
+              },
+              {
+                "id": "decimals",
+                "value": 0
+              },
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "value",
+                    "options": {
+                      "0": {
+                        "text": "Down",
+                        "color": "#f5c2e7",
+                        "index": 0
+                      },
+                      "1": {
+                        "text": "Up",
+                        "color": "#b4befe",
+                        "index": 1
+                      },
+                      "2": {
+                        "text": "Retry",
+                        "color": "#f9e2af",
+                        "index": 2
+                      },
+                      "3": {
+                        "text": "Maint",
+                        "color": "#b4befe",
+                        "index": 3
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "noValue",
+                "value": "Off"
+              }
+            ]
           }
         ]
       },
@@ -375,7 +454,7 @@
         "textMode": "value_and_name",
         "wideLayout": true,
         "text": {
-          "valueSize": 44,
+          "valueSize": 36,
           "titleSize": 12
         },
         "reduceOptions": {
@@ -550,101 +629,6 @@
     },
     {
       "id": 4,
-      "type": "stat",
-      "title": "Down Tester",
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${datasource}"
-      },
-      "gridPos": {
-        "x": 0,
-        "y": 13,
-        "w": 24,
-        "h": 3
-      },
-      "transparent": true,
-      "description": "The test monitor. It is left out of every count, average and chart on this dashboard.",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "expr": "max(monitor_status{monitor_name=~\"(?i) *down tester *\"})",
-          "legendFormat": "",
-          "refId": "A",
-          "instant": true,
-          "range": false
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "unit": "none",
-          "noValue": "Offline",
-          "mappings": [
-            {
-              "type": "value",
-              "options": {
-                "0": {
-                  "text": "Down",
-                  "color": "#f5c2e7",
-                  "index": 0
-                },
-                "1": {
-                  "text": "Up",
-                  "color": "#b4befe",
-                  "index": 1
-                },
-                "2": {
-                  "text": "Retrying",
-                  "color": "#f9e2af",
-                  "index": 2
-                },
-                "3": {
-                  "text": "Maintenance",
-                  "color": "#b4befe",
-                  "index": 3
-                }
-              }
-            }
-          ],
-          "color": {
-            "mode": "thresholds"
-          },
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "#6c7086",
-                "value": null
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "options": {
-        "colorMode": "value",
-        "graphMode": "none",
-        "justifyMode": "center",
-        "orientation": "auto",
-        "textMode": "value",
-        "wideLayout": true,
-        "text": {
-          "valueSize": 22,
-          "titleSize": 12
-        },
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        }
-      }
-    },
-    {
-      "id": 5,
       "type": "status-history",
       "title": "Service status, last 6 hours",
       "description": "One row per service. Each cell is about 10 minutes; blue is up, red is down, yellow is retrying.",
@@ -654,7 +638,7 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 16,
+        "y": 13,
         "w": 24,
         "h": 11
       },
@@ -747,7 +731,7 @@
       }
     },
     {
-      "id": 6,
+      "id": 5,
       "type": "table",
       "title": "Host health",
       "description": "Current CPU, memory and root-disk use for each machine. Bars turn orange at 75% and red at 90%.",
@@ -757,7 +741,7 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 27,
+        "y": 24,
         "w": 24,
         "h": 11
       },
@@ -1077,7 +1061,7 @@
       }
     },
     {
-      "id": 7,
+      "id": 6,
       "type": "bargauge",
       "title": "Latency now",
       "description": "Most recent check time for each service.",
@@ -1087,7 +1071,7 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 38,
+        "y": 35,
         "w": 24,
         "h": 15
       },
@@ -1283,7 +1267,7 @@
       "transparent": true
     },
     {
-      "id": 8,
+      "id": 7,
       "type": "timeseries",
       "title": "Response time",
       "description": "Check time for each service over the selected time range.",
@@ -1293,7 +1277,7 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 53,
+        "y": 50,
         "w": 24,
         "h": 8
       },

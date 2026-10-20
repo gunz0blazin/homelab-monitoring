@@ -30,6 +30,7 @@
 .warn { --tone: var(--warn); }
 .crit { --tone: var(--crit); }
 .info { --tone: var(--info); }
+.pink { --tone: #f5c2e7; }   /* the Down Tester when it is down: its normal state, so not a warning colour */
 
 /* ---------- status header ---------- */
 .head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 20px 40px; padding: 6px 0; }
@@ -53,7 +54,7 @@
 .head .stats2 { display: flex; flex-wrap: wrap; gap: 10px 36px; flex-basis: 100%; margin: 0 30px; padding-top: 16px; border-top: 1px solid var(--line); }
 .head .mnum { font-size: 22px; font-weight: 600; line-height: 1; letter-spacing: -0.02em; }
 .head .mnum.zero { color: var(--faint); }
-.head .mnum.warn, .head .mnum.crit { color: var(--tone); }
+.head .mnum.warn, .head .mnum.crit, .head .mnum.info, .head .mnum.pink { color: var(--tone); }
 .head .cap { margin-top: 8px; font-size: 12px; color: var(--dim); letter-spacing: 0.01em; }
 
 /* ---------- list cards ---------- */

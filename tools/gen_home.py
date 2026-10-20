@@ -60,17 +60,15 @@ HOSTS = color_overrides(HOST_COLORS_COOL, HOST_NAMES)
 LAYOUTS = {
     # phone first: full-width header, hosts and services side by side on a wide screen, then the main
     # dashboard's graphs (status grid, uptime and latency bars), then the trend charts
-    "mobile": {"header": pos(0, 0, 24, 7), "tester": pos(0, 7, 24, 3),
-               "hosts": pos(0, 10, 14, 12), "services": pos(14, 10, 10, 12),
-               "grid": pos(0, 22, 24, 11), "pts": 40, "uptime": pos(0, 33, 12, 15), "latency": pos(12, 33, 12, 15),
-               "row": pos(0, 48, 24, 1),
-               "charts": [pos(0, 49, 24, 9), pos(0, 58, 12, 8), pos(12, 58, 12, 8), pos(0, 66, 24, 8)]},
+    "mobile": {"header": pos(0, 0, 24, 7), "hosts": pos(0, 7, 14, 12), "services": pos(14, 7, 10, 12),
+               "grid": pos(0, 19, 24, 11), "pts": 40, "uptime": pos(0, 30, 12, 15), "latency": pos(12, 30, 12, 15),
+               "row": pos(0, 45, 24, 1),
+               "charts": [pos(0, 46, 24, 9), pos(0, 55, 12, 8), pos(12, 55, 12, 8), pos(0, 63, 24, 8)]},
     # wide screens: hosts and services half and half, then everything from the main dashboard
-    "desktop": {"header": pos(0, 0, 24, 6), "tester": pos(0, 6, 24, 3),
-                "hosts": pos(0, 9, 12, 12), "services": pos(12, 9, 12, 12),
-                "grid": pos(0, 21, 24, 9), "pts": 60, "uptime": pos(0, 30, 12, 11), "latency": pos(12, 30, 12, 11),
-                "row": pos(0, 41, 24, 1),
-                "charts": [pos(0, 42, 24, 10), pos(0, 52, 8, 9), pos(8, 52, 8, 9), pos(16, 52, 8, 9)]},
+    "desktop": {"header": pos(0, 0, 24, 6), "hosts": pos(0, 6, 12, 12), "services": pos(12, 6, 12, 12),
+                "grid": pos(0, 18, 24, 9), "pts": 60, "uptime": pos(0, 27, 12, 11), "latency": pos(12, 27, 12, 11),
+                "row": pos(0, 38, 24, 1),
+                "charts": [pos(0, 39, 24, 10), pos(0, 49, 8, 9), pos(8, 49, 8, 9), pos(16, 49, 8, 9)]},
 }
 
 
@@ -89,10 +87,9 @@ def build(kind, uid, title, path, description):
         q("G", 'up{job="uptime-kuma"}', "kup"),
         q("H", 'avg(' + UPTIME_Q("1d") + ') * 100', "up1d"),
         q("I", 'avg(monitor_response_time{monitor_type="dns",' + NOT_TESTER + '})', "dns"),
+        # the Down Tester: shown in the card's second row, counted in nothing else
+        q("J", 'max(monitor_status{' + ONLY_TESTER + '})', "tester"),
     ], "Status")
-
-    # 1b. the Down Tester, on its own line and in none of the numbers above or below
-    D.tester(g["tester"])
 
     # 2. hosts and 3. services
     card(D, g["hosts"], "hosts.js", "hosts", [

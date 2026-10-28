@@ -1,11 +1,11 @@
-// Tests the card code exactly as shipped in grafana/dashboards/homelab.json, with mock Prometheus frames.
+// Tests the card code exactly as shipped in grafana/dashboards/homelab-mobile.json, with mock Prometheus frames.
 // No dependencies: a ~60 line DOM stub is enough for class selectors and text. Run from the repo root:
 //   node tools/ui/test_ui.js
 const fs = require("fs");
 const path = require("path");
 const assert = require("assert");
 
-const dash = JSON.parse(fs.readFileSync(path.join(__dirname, "../../grafana/dashboards/homelab.json"), "utf8"));
+const dash = JSON.parse(fs.readFileSync(path.join(__dirname, "../../grafana/dashboards/homelab-mobile.json"), "utf8"));
 const panel = (helper) => dash.panels.find((p) => p.options && p.options.content && p.options.content.includes("{{{" + helper + " "));
 
 // run a card's "before content rendering" code and return the helper it registers

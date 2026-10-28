@@ -1,4 +1,4 @@
-"""Shared pieces for the dashboard generators (gen_overview.py, gen_mobile.py, gen_home.py).
+"""Shared pieces for the dashboard generators (gen_overview.py, gen_home.py).
 
 Colour rule: there is no green or teal on any dashboard. "Up" is sapphire (UP), maintenance is lavender, red,
 peach and yellow appear only for real problems, and blue, mauve and lavender are the neutral accents.
@@ -69,7 +69,6 @@ UPTIME_M = steps((BAD, None), (PENDING, 95), (UP, 99))
 # Add a new dashboard here and regenerate all of them.
 NAV = [("homelab-overview", "Overview", "/d/homelab-overview"),
        ("homelab-mobile", "Mobile", "/d/homelab-mobile"),
-       ("homelab", "Testing mobile", "/d/homelab"),
        ("homelab-desktop", "Testing desktop", "/d/homelab-desktop")]
 
 

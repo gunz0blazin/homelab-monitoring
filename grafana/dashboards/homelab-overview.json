@@ -48,18 +48,6 @@
       "tooltip": ""
     },
     {
-      "title": "Testing mobile",
-      "type": "link",
-      "url": "/d/homelab",
-      "icon": "dashboard",
-      "targetBlank": false,
-      "asDropdown": false,
-      "includeVars": false,
-      "keepTime": false,
-      "tags": [],
-      "tooltip": ""
-    },
-    {
       "title": "Testing desktop",
       "type": "link",
       "url": "/d/homelab-desktop",

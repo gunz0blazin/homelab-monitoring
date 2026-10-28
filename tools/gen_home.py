@@ -1,5 +1,5 @@
-# Generates the two testing dashboards from the same cards: grafana/dashboards/homelab.json (phone layout,
-# "Testing mobile") and grafana/dashboards/homelab-desktop.json (wide layout, "Testing desktop").
+# Generates two dashboards from the same cards: grafana/dashboards/homelab-mobile.json (phone layout,
+# "Homelab Mobile", the main mobile dashboard) and grafana/dashboards/homelab-desktop.json (wide layout, "Testing desktop").
 # Run from the repo root: python3 tools/gen_home.py
 # The three cards (status header, hosts, services) are Business Text panels (plugin id
 # marcusolsson-dynamictext-panel) whose HTML/JS/CSS live in tools/ui/. Edit those, regenerate, and commit
@@ -72,7 +72,7 @@ LAYOUTS = {
 }
 
 
-def build(kind, uid, title, path, description):
+def build(kind, uid, title, path, description, tags):
     g = LAYOUTS[kind]
     D = Dash(healthy=UP, maint=C["lavender"])
 
@@ -125,10 +125,12 @@ def build(kind, uid, title, path, description):
     ):
         D.add(chart)
 
-    D.finish(path, uid, title, description, ["homelab", "testing"], nav_links(uid), hide_ds=True)
+    D.finish(path, uid, title, description, tags, nav_links(uid), hide_ds=True)
 
 
-build("mobile", "homelab", "Homelab Testing Mobile", "grafana/dashboards/homelab.json",
-      "Status, hosts and services for the home lab, laid out for a phone. Source: the homelab-monitoring repo.")
+build("mobile", "homelab-mobile", "Homelab Mobile", "grafana/dashboards/homelab-mobile.json",
+      "Status, hosts and services for the home lab, laid out for a phone. Source: the homelab-monitoring repo.",
+      ["homelab", "mobile"])
 build("desktop", "homelab-desktop", "Homelab Testing Desktop", "grafana/dashboards/homelab-desktop.json",
-      "Status, hosts and services for the home lab, laid out for a wide screen. Source: the homelab-monitoring repo.")
+      "Status, hosts and services for the home lab, laid out for a wide screen. Source: the homelab-monitoring repo.",
+      ["homelab", "testing"])

@@ -1,6 +1,6 @@
 # Generates grafana/dashboards/homelab-overview.json. Run from the repo root: python3 tools/gen_overview.py
 # Edit this script (or dashlib.py), regenerate, and commit the script and the JSON together.
-# Same look as gen_mobile.py: no greens ("up" is sapphire, the banner is mauve), red/peach/yellow only for trouble.
+# Same look as the other dashboards: no greens ("up" is sapphire, the banner is mauve), red/peach/yellow only for trouble.
 import os
 import sys
 
